@@ -1,0 +1,72 @@
+/* 몬딱 데모에서만 쓰는 모양(이용자·직원 화면 안). 화면 본래 모양은 프로그램의 ui.html 그대로다. */
+
+/* ---- 이용자 화면: 다음 말이 입력칸에 미리 적혀 있음 */
+#say[readonly]{cursor:default;color:#1f1d1b}
+.demo-ready #say{font-weight:700}
+.demo-tag{display:none!important}         /* 시연 모드 표시: 데모에선 뺌 */
+
+/* 입력칸 위 예시 세 단추 */
+.demo-picks{width:min(940px,calc(100% - 32px));margin:8px auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.demo-picks.hide{display:none}
+.demo-pick{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;min-width:0;background:#fff;overflow:hidden;
+  border:1.5px solid #ece5dd;border-radius:18px;font-family:inherit;transition:border-color .12s,background .12s}
+.demo-pick:hover{border-color:#f3c9a3;background:#fffaf5}
+.demo-pick.on{border-color:#f47a1f;background:#fff4ea;box-shadow:0 0 0 3px rgba(244,122,31,.18)}
+.demo-pick .pt{display:block;height:150px;background:#fff center/contain no-repeat;border-bottom:1px solid #ece5dd}
+.demo-pick .pw{min-width:0;display:flex;flex-direction:column;gap:4px;padding:12px 14px 14px;text-align:center}
+.demo-pick b{font-size:19px;font-weight:800;color:#1f1d1b;line-height:1.3;word-break:keep-all}
+.demo-pick small{font-size:15px;font-weight:700;color:#e2680f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 신청함 폴더(데모): 담긴 파일 보기 */
+.demo-box{width:min(620px,92vw)}
+.demo-box img{display:block;width:100%;margin-top:12px;border:1px solid #ece5dd;border-radius:12px}
+
+/* 첫 화면 글씨: 데모 화면은 높이가 760px라 vh로 정한 글씨가 작아짐 → 크게 고정 */
+#s-start .hero h1{font-size:68px}
+#s-start .hero p{font-size:27px}
+#s-start .start-btn{font-size:29px;font-weight:800;padding:10px 42px 10px 10px;gap:16px}
+#s-start .start-btn .dot{width:64px;height:64px}
+#s-start .start-btn .dot svg.i{width:28px;height:28px}
+#s-start .hint{font-size:19px;margin-top:16px}
+
+/* ---- 직원 화면: 보관 폴더(데모) */
+.modal.folder{width:min(820px,94vw)}
+.fbody{display:grid;grid-template-columns:minmax(230px,300px) minmax(0,1fr);gap:12px;padding:6px 24px 4px;min-height:260px}
+.flist{border:1px solid #ece5dd;border-radius:14px;padding:8px;overflow:auto;max-height:340px;background:#fffcf9}
+.frow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border-radius:10px;cursor:pointer;font-size:16px;font-weight:700}
+.frow:hover{background:#f7f2ed}
+.frow.on{background:#fff4ea;outline:2px solid #f3c9a3}
+.frow span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fdel{all:unset;cursor:pointer;flex:none;font-size:13.5px;font-weight:700;color:#b03a2e;background:#fdeeec;border-radius:8px;padding:4px 9px}
+.fdel:hover{background:#f9d9d5}
+.ftext{margin:0;border:1px solid #ece5dd;border-radius:14px;padding:14px 16px;background:#fff;font-family:inherit;font-size:16px;line-height:1.7;
+  white-space:pre-wrap;word-break:keep-all;overflow:auto;max-height:340px;color:#1f1d1b}
+
+/* ===== 누르고 싶게: 단추가 살짝 작아졌다 커짐 =====
+   transform(scale)으로 줄이면 단추를 사진처럼 늘였다 줄여서 글씨가 번짐 → clip-path로 단추 가장자리만 안쪽으로 들어왔다 나감(글씨는 그대로 또렷).
+   --dr: 단추 모서리 둥글기(알약 모양 단추는 999px). */
+@keyframes demo-squeeze{0%,100%{clip-path:inset(-40px round var(--dr,14px))}50%{clip-path:inset(4px round var(--dr,14px))}}
+@keyframes demo-squeeze-seq{0%,34%,100%{clip-path:inset(-40px round var(--dr,14px))}17%{clip-path:inset(5px round var(--dr,14px))}}
+@keyframes demo-squeeze-big{0%,100%{clip-path:inset(-40px round var(--dr,14px))}50%{clip-path:inset(7px round var(--dr,14px))}}
+#b-go,#b-start,#b-help,#b-close,.start-btn{--dr:999px}
+.demo-pick{--dr:18px}
+
+/* 다음에 누를 단추(보내기·직원 도움·반출 신청·신청 마쳤어요 등), 첫 화면 단추, 직원 화면 보내기, 호출 카드·도움 창 단추 */
+.demo-next,#b-go,#b-start:not([disabled]),#send,[data-k="arrived"],.veil [data-k="go"]{animation:demo-squeeze 1.1s ease-in-out infinite}
+.demo-next{position:relative;z-index:1}
+/* 이용 종료를 누를 차례: 회색 단추라 눈에 안 띄어서 주황으로 칠하고 더 크게 */
+#b-close.demo-next{background:#f47a1f!important;color:#fff!important;border-color:#f47a1f!important;animation:demo-squeeze-big 1s ease-in-out infinite}
+#b-close.demo-next svg{color:#fff;stroke:currentColor}
+/* 차례로: 예시 세 단추(1초씩), 직원 화면 [자리로 가기]→[직접 답변](0.8초 간격) */
+.demo-picks:not(:has(.on)) .demo-pick{animation:demo-squeeze-seq 3s ease-in-out infinite}
+.demo-picks:not(:has(.on)) .demo-pick:nth-child(2){animation-delay:1s}
+.demo-picks:not(:has(.on)) .demo-pick:nth-child(3){animation-delay:2s}
+#go:not([disabled]){animation:demo-squeeze-seq 2.4s ease-in-out infinite}
+#rep:not([disabled]){animation:demo-squeeze-seq 2.4s ease-in-out .8s infinite}
+/* 보내기(화살표) 단추: 작은 단추라 더 깊게 들어왔다 나감 */
+@keyframes demo-squeeze-send{0%,100%{clip-path:inset(-40px round 12px)}50%{clip-path:inset(7px round 10px)}}
+#b-send.demo-next{animation:demo-squeeze-send 1s ease-in-out infinite}
+/* 예시 세 단추: 차례가 오면 조금 들어왔다 나가고 옅은 주황빛(너무 세지 않게) */
+@keyframes demo-pick-seq{0%,34%,100%{clip-path:inset(-40px round 18px);background:#fff;border-color:#ece5dd}
+  17%{clip-path:inset(7px round 17px);background:#fff8f1;border-color:#f6c39a}}
+.demo-picks:not(:has(.on)) .demo-pick{animation-name:demo-pick-seq;animation-duration:3s}

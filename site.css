@@ -1,0 +1,210 @@
+/* 몬딱 데모 페이지(바깥 틀): 평평하고 깔끔하게 — 얇은 테두리, 그림자 없음, 글은 꼭 필요한 것만. 색·글꼴은 몬딱 화면과 같게 */
+@font-face{font-family:"MD KoPub";src:url("assets/fonts/KoPubWorldDotum-Medium.ttf") format("truetype");font-weight:100 599;font-display:swap}
+@font-face{font-family:"MD KoPub";src:url("assets/fonts/KoPubWorldDotum-Bold.ttf") format("truetype");font-weight:600 900;font-display:swap}
+:root{--o:#f47a1f;--o2:#e2680f;--ol:#fde7d4;--ol2:#fff4ea;--ink:#1f1d1b;--ink2:#3b3733;--sub:#7a726b;--line:#e8e1d9;--bg:#f6f3ee;--dark:#2b2622}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"MD KoPub","KoPubWorld돋움체 Medium","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;color:var(--ink);
+  background:var(--bg);font-size:16px;line-height:1.5;word-break:keep-all}
+.hide{display:none!important}
+button{font-family:inherit}
+
+/* 위쪽 줄 */
+.top{position:sticky;top:0;z-index:30;height:61px;display:flex;align-items:center;gap:16px;padding:0 24px;background:rgba(255,255,255,.96);
+  border-top:3px solid var(--o);border-bottom:1px solid var(--line)}
+.home-logo img{height:40px;display:block}
+.top .bar{width:1px;height:30px;background:var(--line)}
+.ttl b{display:block;font-size:20px;font-weight:800;line-height:1.2;color:var(--ink)}
+.ttl span{display:block;font-size:13px;color:var(--sub)}
+.top nav{margin-left:auto;display:flex;gap:2px}
+.top nav a{text-decoration:none;color:var(--ink2);font-weight:700;font-size:17px;padding:8px 16px;border-radius:9px}
+.top nav a:hover{background:#f3efea}
+
+/* 첫 화면: 데모 */
+.demo{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;padding:14px;max-width:1560px;margin:0 auto;align-items:stretch;scroll-margin-top:61px}
+
+.screen{position:relative;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.shead{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--dark)}
+.seg{display:inline-flex;background:rgba(255,255,255,.12);border-radius:10px;padding:3px;gap:2px}
+.seg button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:15.5px;font-weight:800;color:rgba(255,255,255,.75);padding:7px 16px;border-radius:8px}
+.seg button.on{background:#fff;color:var(--ink)}
+.seg button:focus-visible,.reset:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.badge{font-size:12px;font-weight:800;color:#fff;background:#e0442f;border-radius:999px;padding:0 7px;line-height:18px}
+.reset{all:unset;cursor:pointer;margin-left:auto;font-size:14.5px;font-weight:700;color:#fff;background:rgba(255,255,255,.14);border-radius:8px;padding:7px 12px}
+.reset:hover{background:rgba(255,255,255,.24)}
+.scaler{position:relative;width:100%;overflow:hidden;background:#fff}
+.scaler iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;background:#fff}
+
+/* 직원 PC 알림 창(프로그램의 알림 창과 같은 모양) */
+.alert{position:absolute;right:18px;bottom:18px;z-index:5;width:min(580px,calc(100% - 36px));display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;
+  background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 26px;box-shadow:0 22px 54px rgba(0,0,0,.32);animation:none}
+@keyframes al-pop{0%{transform:translateY(16px) scale(.96);opacity:.6}100%{transform:none;opacity:1}}
+@keyframes al-flash{0%{box-shadow:0 0 0 0 rgba(244,122,31,.55),0 22px 54px rgba(0,0,0,.32);background:#fff4ea}70%{box-shadow:0 0 0 12px rgba(244,122,31,0),0 22px 54px rgba(0,0,0,.32);background:#fff}100%{box-shadow:0 0 0 0 rgba(244,122,31,0),0 22px 54px rgba(0,0,0,.32);background:#fff}}
+.alert .pic{width:124px;height:124px;border-radius:50%;background:#fff3e9;display:grid;place-items:center}
+.alert .pic img{height:118px}
+.alert .pill{display:inline-block;font-size:16px;font-weight:800;color:#fff;background:var(--o);border-radius:999px;padding:4px 14px}
+.alert .seat{font-size:31px;font-weight:800;color:#c3570a;margin:3px 0 2px}
+.alert dl{margin:0;display:grid;gap:2px}
+.alert dl div{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;font-size:18px}
+.alert dt{font-weight:800;color:#4a4440}
+.alert dd{margin:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.alert dl div:last-child dd{color:#c45206}
+.alert .btns{display:flex;gap:10px;margin-top:14px}
+.alert button{all:unset;cursor:pointer;font-weight:800;font-size:19px;border-radius:12px;padding:11px 34px;text-align:center}
+.alert .open{background:var(--o);color:#fff}
+.alert .open:hover{background:var(--o2)}
+.alert .shut{border:1px solid #ded6ce;background:#fff}
+.toast{position:absolute;left:50%;top:62px;transform:translate(-50%,-8px);z-index:6;background:var(--dark);color:#fff;border-radius:999px;padding:9px 20px;font-size:15px;font-weight:700;
+  opacity:0;pointer-events:none;transition:.22s;max-width:calc(100% - 40px);white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto;cursor:pointer}
+
+/* 직원 설정 */
+.wrap{max-width:1120px;margin:0 auto;padding:44px 14px 56px}
+.settings{scroll-margin-top:80px}
+.settings h2{margin:0 0 22px;text-align:center;font-size:34px;font-weight:800;letter-spacing:-.02em}
+.set-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.set-col{display:grid;gap:14px}
+fieldset{margin:0;border:1px solid var(--line);border-radius:14px;padding:14px 18px 16px;min-width:0;background:#fff}
+legend{font-size:15px;font-weight:800;color:var(--o2);padding:0 6px}
+.mascots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;height:100%}
+.mcard{display:grid;justify-items:center;align-content:end;gap:4px;border:1px solid var(--line);border-radius:12px;padding:10px 6px;cursor:pointer;position:relative;background:#fff}
+.mcard input{position:absolute;opacity:0;pointer-events:none}
+.mcard:has(input:checked){border-color:var(--o);background:var(--ol2);box-shadow:0 0 0 2px var(--ol)}
+.mcard:has(input:focus-visible){outline:3px solid #2f6fd0;outline-offset:2px}
+.mimg{height:150px;display:flex;align-items:flex-end;justify-content:center;gap:2px}
+.mimg img{height:146px;max-width:100%;object-fit:contain}
+.mimg img+img{height:110px}
+.mimg:has(img+img) img:first-child{height:110px}
+.mcard b{font-size:17px;font-weight:800}
+.line{margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:17px;font-weight:700}
+input[type=number],input[type=text]{font:inherit;font-size:17px;font-weight:700;border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:#fff;color:var(--ink)}
+input[type=number]{width:84px;text-align:right}
+input[name=monthly]{width:112px}
+input[type=text]{width:100%}
+input:focus{outline:none;border-color:var(--o);box-shadow:0 0 0 3px rgba(244,122,31,.15)}
+.check{display:inline-flex;align-items:center;gap:8px;cursor:pointer;margin-right:8px}
+.check input{width:20px;height:20px;accent-color:var(--o)}
+.money{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--ink2)}
+.ghost{all:unset;cursor:pointer;margin-left:auto;border:1px solid var(--line);background:#fff;color:var(--ink2);border-radius:9px;padding:7px 14px;font-weight:700;font-size:15px}
+.ghost:hover{border-color:var(--o);color:var(--o2)}
+.set-foot{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:6px}
+.save{all:unset;cursor:pointer;background:var(--o);color:#fff;font-weight:800;font-size:18px;border-radius:10px;padding:12px 44px}
+.save:hover{background:var(--o2)}
+.save:focus-visible,.ghost:focus-visible{outline:3px solid #2f6fd0;outline-offset:2px}
+#set-msg{font-weight:800;color:#2e9a5f}
+#set-msg:empty{display:none}
+
+footer{background:#ebe6df;padding:22px 16px;text-align:center;color:var(--ink2);font-size:14.5px}
+footer p{margin:2px 0}
+footer .c{color:var(--sub);font-size:13.5px}
+
+@media (max-width:1100px){
+  .demo{grid-template-columns:1fr}
+  .set-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .top{padding:0 12px;gap:10px}
+  .ttl span,.top .bar{display:none}
+  .top nav a{padding:8px 10px;font-size:15px}
+  .alert{grid-template-columns:1fr}
+  .alert .pic{display:none}
+  .toast{white-space:normal;text-align:center}
+}
+
+/* 자동 그림: 위 여름(상반기) · 아래 기본(하반기) */
+.mimg.auto{flex-direction:column;align-items:stretch;justify-content:center;gap:4px}
+.mimg.auto .half{display:flex;align-items:center;justify-content:center;gap:8px;height:71px}
+.mimg.auto .half img{height:70px;max-width:none}
+.mimg.auto small{font-size:14px;font-weight:800;color:var(--o2);width:46px;text-align:left}
+.mimg.auto img+img,.mimg.auto:has(img+img) img:first-child{height:70px}
+
+/* 누르고 싶게: 알림 창 [열기] */
+/* 직원이 답한 뒤 이용자 화면으로 돌아올 때 */
+@keyframes site-in{from{opacity:.25}to{opacity:1}}
+.fade-in{animation:site-in .22s ease-out}
+
+
+/* 직원 설정: 전체를 크게(11/18 밤) — 몬딱 그림은 칸에 맞춰 비율 그대로 키움 */
+.wrap{max-width:1320px}
+.settings h2{font-size:40px;margin-bottom:26px}
+@media (min-width:1101px){.set-grid{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}}
+.set-grid{gap:18px}
+.set-col{gap:18px;grid-auto-rows:1fr}
+.set-col fieldset{display:flex;flex-direction:column;justify-content:center}
+fieldset{padding:18px 22px 20px;border-radius:16px}
+legend{font-size:18px}
+.mascots{gap:12px}
+.mcard{padding:12px 8px 12px;gap:8px;border-radius:14px}
+.mimg{height:260px;width:100%}
+.mimg:not(.auto) img{height:100%;width:100%;max-width:100%;object-fit:contain}
+.mimg.auto .half{height:127px;gap:10px}
+.mimg.auto .half img,.mimg.auto img+img,.mimg.auto:has(img+img) img:first-child{height:126px;width:auto}
+.mimg.auto small{font-size:17px;width:56px}
+.mcard b{font-size:21px}
+.line{font-size:20px;gap:10px}
+input[type=number],input[type=text]{font-size:20px;padding:10px 12px;border-radius:10px}
+input[type=number]{width:96px}
+input[name=monthly]{width:132px}
+.check input{width:24px;height:24px}
+.ghost{font-size:17px;padding:10px 18px}
+.save{font-size:21px;padding:15px 60px;border-radius:12px}
+.save{min-width:200px;text-align:center;box-sizing:border-box}
+.save.done{background:#2e9a5f}
+@media (max-width:640px){
+  .mimg{height:170px}
+  .mimg.auto .half{height:82px;gap:4px}
+  .mimg.auto .half img,.mimg.auto img+img,.mimg.auto:has(img+img) img:first-child{height:80px}
+  .mimg.auto small{font-size:13px;width:40px}
+  .mcard b{font-size:18px}
+}
+
+/* 화면 위 단추(이용자 화면·직원 화면·처음부터): 크게 */
+.shead{padding:12px 16px;gap:14px}
+.seg{border-radius:14px;padding:5px;gap:4px}
+.seg button{font-size:21px;padding:12px 30px;border-radius:11px;gap:8px}
+.badge{font-size:15px;line-height:24px;padding:0 9px}
+.reset{font-size:19px;padding:12px 22px;border-radius:11px}
+@media (max-width:640px){.seg button{font-size:16px;padding:9px 14px}.reset{font-size:15px;padding:9px 12px}}
+.mcard{align-content:center}
+footer{padding:30px 16px}footer .c{font-size:19px;font-weight:700;color:var(--ink2)}
+
+/* 몬딱 그림 칸 정리(11/18 밤): 이름은 맨 아래 크게, 그림은 가운데 같은 크기, 자동은 위아래 칸을 은은하게 나눔 */
+.mcard{display:flex;flex-direction:column;align-items:stretch;align-content:normal;gap:0;padding:12px 10px 0}
+.mimg,.mimg.auto{flex:1;height:auto;min-height:270px;width:auto;display:flex;align-items:center;justify-content:center}
+.mimg:not(.auto) img{height:240px;width:100%;max-width:100%;object-fit:contain}
+.mcard b{display:block;text-align:center;font-size:24px;font-weight:800;padding:12px 0 14px;margin-top:10px;border-top:1px solid var(--line)}
+.mcard:has(input:checked) b{border-top-color:#f3c9a3;color:#c3570a}
+.mimg.auto{flex-direction:column;align-items:stretch;justify-content:stretch;gap:6px}
+.mimg.auto .half{flex:1;height:auto;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:12px}
+.mimg.auto .half:first-child{background:rgba(70,150,210,.08)}
+.mimg.auto .half:last-child{background:rgba(120,110,100,.07)}
+.mimg.auto .half img,.mimg.auto img+img,.mimg.auto:has(img+img) img:first-child{height:118px;width:100%;object-fit:contain}
+.mimg.auto small{font-size:19px;font-weight:800;width:auto;color:var(--o2)}
+@media (max-width:640px){
+  .mimg,.mimg.auto{min-height:170px}
+  .mimg:not(.auto) img{height:150px}
+  .mimg.auto .half img,.mimg.auto img+img,.mimg.auto:has(img+img) img:first-child{height:72px}
+  .mimg.auto small{font-size:13px}
+  .mcard b{font-size:18px;padding:8px 0 10px}
+}
+/* 알림 창 [열기]: 살짝 작아졌다 커지기 */
+#al-open{animation:site-squeeze 1.1s ease-in-out infinite}
+
+/* 자동: 기본 그림부터 여름 그림과 번갈아 바뀜(칸 나누지 않음) */
+.mimg.auto{position:relative;display:block;flex:1;min-height:270px;gap:0}
+.mimg.auto img,.mimg.auto img+img,.mimg.auto:has(img+img) img:first-child{position:absolute;inset:0;margin:auto;height:240px;width:100%;object-fit:contain}
+.mimg.auto .a-base{animation:auto-base 2.8s ease-in-out infinite}
+.mimg.auto .a-summer{animation:auto-summer 2.8s ease-in-out infinite}
+@keyframes auto-base{0%,42%{opacity:1}50%,92%{opacity:0}100%{opacity:1}}
+@keyframes auto-summer{0%,42%{opacity:0}50%,92%{opacity:1}100%{opacity:0}}
+@media (max-width:640px){.mimg.auto{min-height:170px}.mimg.auto img,.mimg.auto img+img,.mimg.auto:has(img+img) img:first-child{height:150px}}
+/* [열기]: 글씨가 번지지 않게 가장자리만 들어왔다 나감 */
+@keyframes site-squeeze{0%,100%{clip-path:inset(-40px round 12px)}50%{clip-path:inset(4px round 12px)}}
+/* 직원 알림: 화면 틀이 아니라 브라우저 창 오른쪽 아래 끝에(실제 PC 알림처럼) */
+.alert{position:fixed;right:20px;bottom:20px;z-index:50}
+/* 화면 위 단추 줄: 조금 낮고 좁게(데모 화면이 더 위로 올라오게) */
+.shead{padding:6px 12px;gap:10px}
+.seg{border-radius:12px;padding:4px;gap:3px}
+.seg button{font-size:18px;padding:7px 22px;border-radius:9px}
+.reset{font-size:16px;padding:7px 16px;border-radius:9px}
+.alert dt{text-align:center}          /* 찾는 것·상황 이름표를 칸 가운데로 */

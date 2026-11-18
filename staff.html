@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>몬딱</title>
+<link rel="icon" href="assets/mascot-profile.png">   <!-- 작업 표시줄 아이콘: 이용자 창과 같은 몬딱 증명사진(11/17) -->
+<style>
+/* 직원 PC 몬딱 — 문의함 · 메모 · [자리로 가기][직접 답변][처리 완료]. 센터 내부망·오프라인이라 바깥 글꼴·스크립트 없음
+   11/17: 겉모습을 이용자 화면(app/visitor/ui.html)에 맞춤 — 같은 색 변수·글씨 로고·둥근 단추·카드·그림자. 기능·배치는 그대로 */
+@font-face{font-family:"MD KoPub";src:url("assets/fonts/KoPubWorldDotum-Medium.ttf") format("truetype");font-weight:100 599;font-display:swap}
+@font-face{font-family:"MD KoPub";src:url("assets/fonts/KoPubWorldDotum-Bold.ttf") format("truetype");font-weight:600 900;font-display:swap}
+:root{--o:#f47a1f;--o2:#e2680f;--ol:#fde7d4;--ol2:#fff4ea;--ink:#1f1d1b;--ink2:#3b3733;--sub:#7a726b;--mute:#a39b94;
+  --line:#ece5dd;--card:#fff;--paper:#fffcf9;--side:#faf6f1;--blue:#2f6fd0;--bl:#eaf2fd;--ok:#2e9a5f;--okl:#eaf7ef;
+  --red:#b03a2e;--redl:#fdeeec;--sh:0 1px 2px rgba(80,50,20,.05),0 4px 14px rgba(80,50,20,.07)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:"MD KoPub","KoPubWorld돋움체 Medium","Malgun Gothic",system-ui,sans-serif;color:var(--ink);background:#fff;
+  display:flex;flex-direction:column;font-size:17px;word-break:keep-all;overflow-wrap:break-word;color-scheme:light}
+button{font-family:inherit}
+
+/* 위쪽 줄: 이용자 화면 .top과 같게(흰 바탕, 글씨 로고 64px, 둥근 알약) */
+header{display:flex;align-items:center;gap:16px;padding:10px 20px 8px;background:#fff}
+.logo{display:inline-flex;align-items:center;gap:14px}
+.logo img{height:64px;width:auto;display:block}        /* 이용자 화면과 같은 몬딱 글씨 로고(크기별로 미리 줄여 둔 그림이라 또렷함) */
+.logo small{font-size:18px;font-weight:800;color:#8a3f00;background:var(--ol);border-radius:999px;padding:9px 18px}
+.live{margin-left:auto;display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:11px 20px;
+  font-size:17px;font-weight:700;color:var(--ok);background:var(--okl)}
+.live::before{content:"";width:10px;height:10px;border-radius:50%;background:currentColor}
+.vhint{margin:0 6px 8px;font-size:15px;color:var(--sub);line-height:1.5}
+.vnote{margin-top:14px;font-size:15.5px;color:var(--sub);line-height:1.55}
+.live.off{color:var(--red);background:var(--redl)}
+
+/* 왼쪽 문의함 = 이용자 화면 오른쪽 칸(.panel), 오른쪽 문의 내용 = 대화 칸(.main) */
+main{flex:1;display:grid;grid-template-columns:380px minmax(0,1fr);gap:12px;min-height:0;padding:2px 14px 14px}
+/* 스크롤 막대 자리(8px)를 늘 잡아 두고 오른쪽 안쪽 여백을 그만큼 줄임 → 막대가 있든 없든 탭·카드가 칸 가운데에 옴(11/17) */
+.list{border:1px solid var(--line);border-radius:22px;background:#fff;padding:14px 6px 14px 14px;overflow:auto;scrollbar-gutter:stable;display:flex;flex-direction:column;gap:8px}
+.list::-webkit-scrollbar{width:8px}
+.list::-webkit-scrollbar-thumb{background:#d9d0c7;border-radius:8px}
+.list::-webkit-scrollbar-track{background:transparent}
+/* 11/17: 문의함 / 처리 완료 탭 — 처리 완료한 문의는 문의함에서 빠지고 '처리 완료'에 보관(다시 읽기 가능) */
+.tabs{display:flex;gap:6px;margin:-14px -6px 4px -14px;padding:14px 6px 8px 14px;position:sticky;top:-14px;z-index:2;background:#fff;border-radius:22px 22px 0 0}   /* 문의가 많아 내려도 탭은 위에 */
+.tab{all:unset;cursor:pointer;box-sizing:border-box;flex:1 1 0;min-width:0;position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border-radius:999px;padding:11px 4px;text-align:center;font-weight:800;font-size:16px;white-space:nowrap;      /* 세 탭 너비 같게, 글자는 가운데 */background:#f3efea;color:var(--ink2)}
+.tab:hover{background:#ebe5de}
+.tab:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.tab.on{background:var(--o);color:#fff}
+.tab .c{font-size:14px;font-weight:800;border-radius:999px;padding:1px 9px;background:rgba(255,255,255,.75);color:#8a3f00}
+.tab:not(.on) .c{background:#fff;color:var(--sub)}
+.unread-n{margin:4px 6px 2px;font-size:16px;font-weight:800;color:#c3570a}
+.tab .dot{position:absolute;top:5px;right:9px;width:9px;height:9px;border-radius:50%;background:#e0442f;box-shadow:0 0 0 2px #fff}   /* 너비를 차지하지 않게 모서리에 */
+/* 처리 완료 정리(11/17): 한 달 주기로 보관 파일로 옮기거나 지우기 — 직원 화면에서만 */
+.tidy{display:flex;gap:8px;flex-wrap:wrap;margin:2px 2px 4px}
+.tidy .btn{padding:9px 16px;font-size:16px}
+.remind{margin:0 2px 4px;background:#fff4dc;border:1px solid #f0d08a;color:#7a4f00;border-radius:12px;padding:10px 14px;font-size:15.5px;font-weight:700;line-height:1.45}
+.veil{position:fixed;inset:0;background:rgba(40,30,20,.38);display:grid;place-items:center;z-index:20}
+.modal{width:min(520px,92vw);background:#fff;border-radius:22px;box-shadow:0 20px 50px rgba(0,0,0,.25);overflow:hidden}
+.modal .mh{padding:20px 24px 6px;font-size:22px;font-weight:800}
+.modal .mb{padding:4px 24px 8px;font-size:17px;color:var(--ink2);line-height:1.55}
+.modal .mb label{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:18px;font-weight:700;color:var(--ink);cursor:pointer}
+.modal .mb input{width:20px;height:20px;accent-color:var(--o)}
+.modal .mf{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;padding:12px 24px 22px}
+/* 선택해서 정리·보관함(11/17) */
+.pickbar{margin:0 2px 4px;background:var(--ol2);border:1px solid #f3c9a3;border-radius:14px;padding:10px 12px}
+.pickbar b{display:block;margin:0 2px 6px;font-size:16px;color:#8a3f00}
+.pickbar .tidy{margin:0}
+.q .ck{display:inline-grid;place-items:center;width:22px;height:22px;border:2px solid #cfc6bd;border-radius:6px;background:#fff;color:#fff;font-size:15px;font-weight:800;margin-right:2px}
+.q.picked{outline:3px solid var(--o);outline-offset:-1px;background:var(--ol2)}
+.q.picked .ck{background:var(--o);border-color:var(--o)}
+.htable{width:100%;border-collapse:separate;border-spacing:0;margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  box-shadow:var(--sh);font-size:17.5px}
+.htable th{text-align:left;padding:12px 18px;background:var(--side);font-weight:800;border-bottom:1px solid var(--line)}
+.htable td{padding:11px 18px;border-top:1px solid #f3eee8}
+.htable tbody tr:first-child td{border-top:0}
+.arcdoc{white-space:pre-wrap;word-break:keep-all;margin:16px 0 0;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 22px;
+  font-family:inherit;font-size:17.5px;line-height:1.75;color:var(--ink);box-shadow:var(--sh)}
+.btn.r{background:#c0392b;border-color:#c0392b;color:#fff}
+.btn.r:hover{background:#a93226}
+.q{all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:#fff;
+  transition:background .12s,border-color .12s}
+.q:hover{background:var(--side)}
+.q:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.q.on{outline:3px solid var(--o);outline-offset:-1px}                 /* 지금 열어 본 문의 */
+.q .meta{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--sub)}
+.q .meta b{color:#c3570a;font-weight:800}
+.q .meta .new,.q .meta .left,.q .meta .done{margin-left:auto;font-size:14px;font-weight:700;border-radius:8px;padding:3px 9px}
+.q .meta .new{color:#fff;background:var(--o)}                       /* 안 읽음 */
+.q .meta .done{color:var(--sub);background:#f3efea}
+.q .meta .left{color:var(--red);background:var(--redl)}
+.q .meta .kreply,.q .meta .kvisit{margin-left:auto;font-size:14px;font-weight:700;border-radius:8px;padding:3px 9px}
+.q .meta .kreply{color:#2259ad;background:var(--bl)}                  /* 답변 완료 */
+.q .meta .kvisit{color:#1f7a49;background:var(--okl)}                 /* 자리로 방문 */
+/* 읽음 표시(11/17: 구분이 약하다는 지적) — 안 읽은 문의: 주황 바탕·굵은 왼쪽 띠·굵은 글씨·'안 읽음' 꼬리표
+   읽은 문의: 흰 바탕에 옅은 글씨·회색 꼬리표(메일처럼) */
+.q.unread{background:#fff1e3;border-color:#f3c9a3;box-shadow:inset 8px 0 0 var(--o);padding-left:24px}
+.q.unread .want{font-weight:800;color:var(--ink)}
+.q.unread .meta b::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--o);margin-right:6px;vertical-align:1px}
+.q.read{background:#fff}
+.q.read .meta b{color:#a8826a;font-weight:700}
+.q.read .want{font-weight:500;color:#8a827b}
+.q.read .why{color:var(--mute)}
+.q .want{display:block;margin-top:6px;font-size:18px;font-weight:700;line-height:1.45}
+.q .why{display:block;margin-top:2px;font-size:15.5px;color:var(--sub)}
+.none{color:var(--sub);font-size:16px;padding:8px 6px}
+
+.note{overflow:auto;padding:26px max(28px,calc((100% - 940px)/2));background:var(--paper);border:1px solid #f0e6da;border-radius:22px}
+.empty{height:100%;display:grid;place-content:center;justify-items:center;gap:12px;color:var(--sub);font-size:18px}
+.empty img{width:120px}
+.seat{font-size:30px;font-weight:800;color:#c3570a;letter-spacing:-.02em}
+.when{font-size:15.5px;color:var(--sub);margin-top:4px}
+/* 이용자가 상담을 끝냄(11/17): 빈자리로 가거나 못 읽을 답을 보내지 않게 */
+.donebar{margin-top:16px;background:#f3efea;border:1px solid var(--line);color:var(--ink2);border-radius:16px;padding:14px 20px;font-size:18px;font-weight:700;line-height:1.5}
+.gone{margin-top:16px;background:var(--redl);border:1px solid #f3c9c3;color:#a3301f;border-radius:16px;padding:14px 20px;font-size:18px;font-weight:700;line-height:1.5}
+/* 문의 내용(11/07: 항목 이름이 안 보이고 줄이 안 맞는다는 지적) — 이름표는 위, 내용은 아래로 카드처럼(이용자 화면 .card) */
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:18px 0 4px}
+.info .it{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 20px;box-shadow:var(--sh)}
+.info .lab{display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:800;border-radius:999px;padding:5px 13px;margin-bottom:10px;
+  color:#b4520a;background:var(--ol2);border:1px solid #f6d3b3}
+.info .lab::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--o)}
+.info .it.why .lab{color:#2259ad;background:var(--bl);border-color:#cfe0f7}
+.info .it.why .lab::before{background:var(--blue)}
+.info .val{font-size:20px;font-weight:700;line-height:1.5;color:var(--ink);word-break:keep-all}
+.sec{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 20px;box-shadow:var(--sh)}
+.sec h3{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:18px;font-weight:800;color:var(--ink)}
+.sec h3::before{content:"";width:4px;height:18px;border-radius:2px;background:var(--o)}
+.sec p,.sec li{font-size:17.5px;line-height:1.65;color:var(--ink2);margin:0;word-break:keep-all}
+.sec ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.sec li{position:relative;padding-left:20px}
+.sec li::before{content:"";position:absolute;left:4px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--o)}
+/* 단추: 이용자 화면 .btn(둥근 12px, 주황·흰색) — 크게 */
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.btn{all:unset;cursor:pointer;display:inline-flex;align-items:center;border-radius:12px;padding:13px 24px;font-weight:700;font-size:18px;
+  border:1px solid var(--line);background:#fff;color:var(--ink);transition:background .12s}
+.btn:hover{background:#f7f2ed}
+.btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.btn.o{background:var(--o);border-color:var(--o);color:#fff}
+.btn.o:hover{background:var(--o2)}
+.btn.b{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.b:hover{background:#2861b8}
+.btn[disabled]{opacity:.4;cursor:default;pointer-events:none}
+.reply{margin-top:16px;border:1px solid var(--line);border-radius:18px;padding:18px 20px;display:none;gap:12px;background:#fff;max-width:760px;box-shadow:var(--sh)}
+.reply.open{display:grid}
+.reply label{font-size:15.5px;color:var(--sub)}
+textarea{font:inherit;font-size:17.5px;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;min-height:110px;resize:vertical}
+textarea:focus{outline:none;border-color:var(--o);box-shadow:0 0 0 3px rgba(244,122,31,.15)}
+.drop{display:block;border:2px dashed #e8c9ad;border-radius:14px;padding:12px 16px;font-size:16px;color:#b4560c;background:#fffaf5;cursor:pointer}
+.drop:hover{background:#fff1e4;border-color:var(--o)}
+.drop.has{color:var(--ink);border-style:solid;border-color:#bfe5cd;background:var(--okl)}
+.hist{border-top:1px solid var(--line);margin-top:20px;padding-top:14px}
+.hist h3{margin:0 0 6px;font-size:16px;font-weight:700;color:var(--sub)}
+.h{font-size:16px;color:var(--ink2);padding:3px 0}
+.h time{color:var(--sub);margin-right:10px}
+/* 알림 글: 이용자 화면 알림(.err)과 같은 진한 둥근 띠 */
+.toast{position:fixed;right:20px;bottom:20px;background:#2b2622;color:#fff;border-radius:12px;padding:13px 20px;font-size:16.5px;font-weight:700;
+  box-shadow:0 10px 26px rgba(0,0,0,.2);opacity:0;transform:translateY(8px);transition:.25s;max-width:440px}
+.toast.show{opacity:1;transform:none}
+</style>
+<link rel="stylesheet" href="demo.css?v=50a64e1f"></head>
+<body>
+<header>
+  <span class="logo"><img src="assets/logo-64.png" srcset="assets/logo-64.png 1x, assets/logo-128.png 2x, assets/logo-192.png 3x" alt="몬딱"><small>직원 문의함</small></span>
+  <span class="live" id="live">알림 받는 중</span>
+</header>
+<main>
+  <nav class="list" id="list" aria-label="문의함"></nav>
+  <section class="note" id="note"></section>
+</main>
+<div class="toast" id="toast" role="status"></div>
+<script src="data.js?v=cb9f3511"></script>
+<script src="staff_demo.js?v=6c4472ec"></script>
+<script>
+const KO = {new:"새 문의", coming:"자리로 방문", replied:"답변 완료", done:"처리 완료", left:"상담 끝남"};
+const P = new URLSearchParams(location.hash.slice(1));
+const TOKEN = P.get("t") || sessionStorage.getItem("t") || "";
+try { sessionStorage.setItem("t", TOKEN); } catch (e) {}
+let items = [], sel = P.get("s") || "", seen = null, replyOpen = false, file = null, lastStatus = {}, tab = "inbox", first = true,
+    oldDone = 0, clearDays = 30, picking = false, picked = new Set(), histMonths = [], histTotal = 0, histSel = "", histRows = [];
+history.replaceState(null, "", location.pathname);           // 주소 줄에 비밀 표식이 남지 않게
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// 문장마다 새 줄(11/07: "구체적인…"부터는 아래 줄로) — 마침표·물음표·느낌표 뒤 띄어쓰기에서 나눔
+const lines = s => String(s ?? "").trim().split(/(?<=[.!?])\s+/).filter(Boolean).map(esc).join("<br>");
+function api(path, body) { return DEMO_STAFF_API(path, body); }
+function toast(t) { const el = $("toast"); el.textContent = t; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 3500); }
+
+function memoParts(memo) {        // 정리문 글 → 받은 시각·소제목별 내용
+  const lines = String(memo || "").split("\n");
+  let when = "", secs = [], cur = null;
+  lines.forEach((ln, i) => {
+    if (i === 0 && ln.startsWith("[문의 정리문]")) return;
+    if (i === 1 && /^자리:/.test(ln)) { const m = ln.match(/작성 ([0-9-]+ [0-9:]+)/); when = m ? m[1] : ""; return; }
+    if (ln.startsWith("■")) { cur = {h: ln.replace(/^■\s*/, ""), items: [], ps: []}; secs.push(cur); return; }
+    if (!cur || !ln.trim()) return;
+    if (ln.startsWith("- ")) cur.items.push(ln.slice(2)); else cur.ps.push(ln);
+  });
+  return {when, secs};
+}
+
+// 11/17 밤: '문의함' 탭(11/18까지 이름 '문의 내용') = 아직 아무것도 하지 않은 새 문의만. 자리로 가기·직접 답변을 하거나 이용자가 상담을 끝내면 바로 '처리 완료'로
+const HANDLED = ["coming", "replied", "done", "left"];
+const inbox = () => items.filter(i => !HANDLED.includes(i.status));
+const doneList = () => items.filter(i => HANDLED.includes(i.status)).sort((a, b) => String(b.updated || "").localeCompare(String(a.updated || "")));
+const doneTime = i => ((i.history || []).filter(h => h.kind === "done").pop() || {}).time || "";
+const lastTime = i => ((i.history || []).slice(-1)[0] || {}).time || "";
+
+// 처리 완료의 구분(11/17 밤): 직원이 한 일로 두 가지 — 답변 완료 / 자리로 방문(둘 다 했으면 나중에 한 것)
+const staffAct = i => (i.history || []).filter(h => h.kind === "reply" || h.kind === "coming").pop();
+function tagOf(i) {
+  if (HANDLED.includes(i.status)) {
+    const a = staffAct(i);
+    if (a) return `<span class="${a.kind === "reply" ? "kreply" : "kvisit"}">${a.kind === "reply" ? "답변 완료" : "자리로 방문"} ${esc((a.time || "").slice(-5))}</span>`;
+    return `<span class="left">상담 끝남</span>`;                       // 직원이 손대기 전에 이용자가 상담을 끝냄
+  }
+  if (!i.read) return `<span class="new">안 읽음</span>`;
+  return `<span class="done">${i.status === "new" ? "읽음" : KO[i.status]}</span>`;
+}
+
+function renderList() {
+  const box = inbox(), fin = doneList(), shown = tab === "done" ? fin : box;
+  const n = box.filter(i => !i.read).length;
+  if (tab !== "arc" && sel && !shown.some(i => i.session === sel)) sel = "";      // 다른 탭의 문의는 닫음
+  for (const s of [...picked]) if (!fin.some(i => i.session === s)) picked.delete(s);
+  const leftNew = fin.filter(i => i.status === "left" && !i.read).length;    /* 11/18 점검 6번: 안 읽은 '상담 끝남'이 처리 완료 탭에서 눈에 띄게 */
+  const tabs = `<div class="tabs" role="tablist">
+      <button class="tab ${tab === "inbox" ? "on" : ""}" data-t="inbox" role="tab">문의함 <span class="c">${box.length}</span></button>
+      <button class="tab ${tab === "done" ? "on" : ""}" data-t="done" role="tab">처리 완료 <span class="c">${fin.length}</span>${oldDone || leftNew ? `<span class="dot" title="${leftNew ? "이용자가 상담을 끝낸 문의가 있어요" : "정리할 것이 있어요"}"></span>` : ""}</button>
+      <button class="tab ${tab === "arc" ? "on" : ""}" data-t="arc" role="tab">보관함 <span class="c">${histTotal}</span></button></div>`;
+  let body = "";
+  if (tab === "arc") {
+    body = `<p class="vhint">지금까지의 방문 내역(날짜·성별·연령대·방문 목적)이에요. 달마다 보관 폴더에 텍스트 파일로 쌓여요. 폴더에서 파일을 지우면 여기서도 사라져요.</p>
+      <div class="tidy"><button class="btn" id="openArc">보관 폴더 열기</button></div>` +
+      (histMonths.length ? histMonths.map(m => `
+      <button class="q read ${m.month === histSel ? "on" : ""}" data-h="${esc(m.month)}">
+        <span class="meta"><b>${esc(monthKo(m.month))}</b><span class="done">${esc(m.month)}.txt</span></span>
+        <span class="want">방문 ${m.count}건</span>
+      </button>`).join("") : `<p class="none">아직 쌓인 방문 내역이 없어요. 이용자가 상담을 끝내면 한 줄씩 쌓여요.</p>`);
+  } else {
+    const bar = tab !== "done" ? "" : picking
+      ? `<div class="pickbar"><b>${picked.size ? `${picked.size}건 골랐어요` : "옮기거나 지울 문의를 눌러 고르세요"}</b><div class="tidy">
+           <button class="btn o" id="pMove" ${picked.size ? "" : "disabled"}>보관 폴더로 옮기기</button>
+           <button class="btn r" id="pDel" ${picked.size ? "" : "disabled"}>지우기</button>
+           <button class="btn" id="pStop">취소</button></div></div>`
+      : `<div class="tidy"><button class="btn o" id="oldMove" ${oldDone ? "" : "disabled"}>${clearDays}일 지난 것 옮기기(${oldDone}건)</button>
+           <button class="btn" id="pStart" ${fin.length ? "" : "disabled"}>선택</button>
+           <button class="btn" id="openArc">보관 폴더 열기</button></div>` +
+        (oldDone ? `<p class="remind">처리한 지 ${clearDays}일 지난 문의가 ${oldDone}건 있어요. '${clearDays}일 지난 것 옮기기'를 눌러 보관 폴더로 옮겨 주세요.</p>` : "");
+    body = bar + (tab === "inbox" && n ? `<p class="unread-n">안 읽은 문의 ${n}건</p>` : "") +
+      (tab === "done" && leftNew ? `<p class="unread-n">이용자가 상담을 끝낸 문의 ${leftNew}건(안 읽음)</p>` : "") +
+      (shown.length ? shown.map(i => {
+        const pk = tab === "done" && picking;
+        return `
+      <button class="q ${(tab === "done" && i.status !== "left") || i.read ? "read" : "unread"} s-${esc(i.status)} ${!pk && i.session === sel ? "on" : ""} ${pk && picked.has(i.session) ? "picked" : ""}" data-s="${esc(i.session)}">
+        <span class="meta">${pk ? `<span class="ck">${picked.has(i.session) ? "✓" : ""}</span>` : ""}<b>${esc(i.seat)}</b>${esc((i.time || "").slice(-5))}${tagOf(i)}</span>
+        <span class="want">${esc(i.want)}</span>
+        ${i.why ? `<span class="why">${esc(i.why)}</span>` : ""}
+      </button>`; }).join("") : `<p class="none">${tab === "done" ? "처리 완료한 문의가 아직 없어요." : "지금 남은 문의가 없어요."}</p>`);
+  }
+  $("list").innerHTML = tabs + body;
+  document.querySelectorAll(".q[data-s]").forEach(b => b.onclick = () => {
+    if (tab === "done" && picking) { picked.has(b.dataset.s) ? picked.delete(b.dataset.s) : picked.add(b.dataset.s); renderList(); return; }
+    sel = b.dataset.s; replyOpen = false; file = null; markRead(sel); render();
+  });
+  document.querySelectorAll(".q[data-h]").forEach(b => b.onclick = () => { histSel = b.dataset.h; loadHistory().then(render); });
+  document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
+    if (tab === b.dataset.t) return;
+    tab = b.dataset.t; sel = ""; picking = false; picked.clear(); replyOpen = false; file = null;
+    if (tab === "arc") loadHistory().then(render); render();
+  });
+  // 처리 완료 탭: 옮긴 처리 내용(텍스트 파일) 폴더 / 보관함 탭: 방문 내역 폴더
+  if ($("openArc")) $("openArc").onclick = () => api("/api/open_archive", {which: tab === "arc" ? "visit" : "inquiry"})
+    .then(r => toast(r.opened ? "보관 폴더를 열었어요. 새 창으로 떠요." : `보관 폴더를 열지 못했어요. 이 폴더를 직접 열어 주세요: ${r.folder || ""}`))
+    .catch(() => toast("보관 폴더를 열지 못했어요. 잠시 뒤 다시 눌러 주세요."));
+  if ($("oldMove")) $("oldMove").onclick = () => clearDone("old", "move", []);
+  if ($("pStart")) $("pStart").onclick = () => { picking = true; sel = ""; render(); };
+  if ($("pStop")) $("pStop").onclick = () => { picking = false; picked.clear(); render(); };
+  if ($("pMove")) $("pMove").onclick = () => clearDone("pick", "move", [...picked]);
+  if ($("pDel")) $("pDel").onclick = () => confirmBox(`고른 ${picked.size}건을 지울까요?`, "지운 내용은 되살릴 수 없어요. 남겨 두려면 '보관 폴더로 옮기기'를 누르세요.",
+    () => clearDone("pick", "delete", [...picked]));
+}
+
+// 처리 완료 정리(직원 화면에서만): 30일 지난 것 한 번에 보관 / 골라서 보관·지우기
+function clearDone(scope, action, sessions) {
+  return api("/api/clear", {scope, action, sessions}).then(r => {
+    picking = false; picked.clear(); sel = "";
+    toast(action === "move" ? `${r.count}건을 보관 폴더로 옮겼어요. '보관 폴더 열기'로 볼 수 있어요.` : `${r.count}건을 지웠어요.`);
+    refresh();
+  }).catch(() => toast(action === "move" ? "옮기지 못했어요. 잠시 뒤 다시 눌러 주세요." : "지우지 못했어요. 잠시 뒤 다시 눌러 주세요."));
+}
+function confirmBox(title, msg, yes) {
+  const v = document.createElement("div"); v.className = "veil";
+  v.innerHTML = `<div class="modal" role="alertdialog"><div class="mh">${esc(title)}</div><div class="mb">${esc(msg)}</div>
+    <div class="mf"><button class="btn" id="cNo">취소</button><button class="btn r" id="cYes">지우기</button></div></div>`;
+  v.onclick = e => { if (e.target === v) v.remove(); };
+  document.body.appendChild(v);
+  v.querySelector("#cNo").onclick = () => v.remove();
+  v.querySelector("#cYes").onclick = () => { v.remove(); yes(); };
+}
+
+// 보관함 = 방문 내역(11/17 밤): 보관 폴더의 달별 파일을 그때그때 읽음(탐색기에서 지운 파일은 다음 새로 고침에 빠짐)
+function loadHistory() {
+  return api("/api/history" + (histSel ? "?month=" + encodeURIComponent(histSel) : "")).then(d => {
+    histMonths = d.months || []; histTotal = d.total || 0; histSel = d.month || ""; histRows = d.rows || [];
+  }).catch(() => {});
+}
+
+function renderNote() {
+  if (tab === "arc") {
+    $("note").innerHTML = histSel ? `<div class="seat">${esc(monthKo(histSel))} 방문 내역</div>
+      <div class="when">방문 ${histRows.length}건 · 보관 폴더의 ${esc(histSel)}.txt</div>
+      <table class="htable"><thead><tr><th>날짜</th><th>성별</th><th>연령대</th><th>방문 목적</th></tr></thead>
+        <tbody>${histRows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>
+      <p class="vnote">· 이용자가 상담을 끝낼 때마다 한 줄씩 쌓여요. 이름·연락처·질문 내용은 들어 있지 않아요.<br>
+        · 이 표는 보관 폴더의 ${esc(histSel)}.txt 파일 그대로예요(메모장으로 열려요). 폴더에서 파일을 지우면 여기서도 사라져요.</p>`
+      : `<div class="empty"><img src="assets/mascot-small.png" alt="">이용자가 상담을 끝내면 방문 내역이 여기에 쌓여요.</div>`;
+    return;
+  }
+  const cur = items.find(i => i.session === sel);
+  if (!cur) {
+    const msg = tab === "done" ? (doneList().length ? "왼쪽에서 문의를 고르면 문의 내용과 처리 내용을 다시 읽을 수 있어요." : "자리로 가거나 직접 답변한 문의가 여기로 옮겨 와요.")
+                               : (inbox().length ? "왼쪽 목록에서 문의를 골라 주세요." : "새 문의가 오면 여기에 떠요.");
+    $("note").innerHTML = `<div class="empty"><img src="assets/mascot-small.png" alt="">${msg}</div>`; return;
+  }
+  const m = memoParts(cur.memo), done = cur.status === "done", left = cur.status === "left";
+  const same = t => String(t || "").replace(/\s/g, "") === String(cur.want || "").replace(/\s/g, "");
+  const secs = m.secs.filter(s => !(s.ps.length === 1 && !s.items.length && same(s.ps[0])))   // 위 '찾으시는 것'과 같은 글은 한 번만
+    .map(s => `<div class="sec"><h3>${esc(s.h)}</h3>${s.ps.map(p => `<p>${lines(p)}</p>`).join("")}${
+    s.items.length ? `<ul>${s.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div>`).join("");
+  const hist = (cur.history || []).map(h => `<div class="h"><time>${esc((h.time || "").slice(-5))}</time>${
+    {coming: "자리로 가는 중이라고 알림", reply: "직접 답변", done: "처리 완료", left: "이용자가 상담을 끝냄"}[h.kind]}${h.text ? " · " + esc(h.text) : ""}${h.file_name ? " · 보낸 파일 " + esc(h.file_name) : ""}</div>`).join("");
+  $("note").innerHTML = `
+    <div class="seat">${esc(cur.seat)}</div>
+    <div class="when">${m.when ? "받은 시각 " + esc(m.when) + " · " : ""}${KO[cur.status] || ""}</div>
+    ${done ? `<div class="donebar">${esc(doneTime(cur).slice(-5))}에 처리 완료한 문의예요. 문의 내용과 처리 내용을 다시 읽을 수 있어요.</div>` : ""}
+    ${left ? `<div class="gone">이용자가 ${esc((cur.left_time || "").slice(-5))}에 상담을 끝냈어요. 자리로 가지 않아도 돼요.</div>` : ""}
+    <div class="info"><div class="it"><span class="lab">찾으시는 것</span><div class="val">${lines(cur.want || "적힌 내용이 없어요. 이용자에게 직접 여쭤봐 주세요.")}</div></div>
+      ${cur.why ? `<div class="it why"><span class="lab">도움이 필요한 이유</span><div class="val">${lines(cur.why)}</div></div>` : ""}</div>
+    ${done ? "" : `<div class="actions">
+      <button class="btn o" id="go" ${left ? "disabled" : ""}>자리로 가기</button>
+      <button class="btn b" id="rep" ${left ? "disabled" : ""}>직접 답변</button>
+    </div>`}
+    <div class="reply ${replyOpen ? "open" : ""}" id="replyBox">
+      <label for="txt">이용자에게 보낼 말(이용자 화면에 '몬딱 운영자' 이름으로 떠요)</label>
+      <textarea id="txt" placeholder="예: 센터 표에는 없지만 제가 찾은 자료를 보내 드려요."></textarea>
+      <label class="drop ${file ? "has" : ""}" id="drop"><span id="fname">${file ? esc(file.name) : "보낼 파일 고르기(없어도 돼요 · CSV나 엑셀(.xlsx), 20MB까지)"}</span>
+        <input type="file" id="fileIn" hidden accept=".csv,.xlsx"></label>
+      <div style="display:flex;gap:10px"><button class="btn b" id="send">보내기</button><button class="btn" id="cancel">취소</button></div>
+    </div>
+    <div style="margin-top:8px">${secs}</div>
+    ${hist ? `<div class="hist"><h3>처리 내용</h3>${hist}</div>` : ""}`;
+  // 자리로 가기·직접 답변을 하면 처리 완료로 옮기고, 방금 그 문의를 그대로 열어 둠(다시 읽기)
+  const push = (kind, extra = {}, msg = "") => api("/api/push", {session: cur.session, kind, ...extra}).then(() => {
+    const moved = tab !== "done";
+    tab = "done"; sel = cur.session; replyOpen = false; file = null;
+    if (msg || moved) toast((msg ? msg + " " : "") + (moved ? "'처리 완료'로 옮겼어요." : ""));
+    refresh();
+  }).catch(() => { toast("이용자에게 전하지 못했어요. 이용자가 상담을 끝냈을 수 있어요. 잠시 뒤 다시 눌러 주세요."); refresh(); });
+  if (done) return;                                                     // 처리 완료한 문의: 읽기만
+  $("go").onclick = () => push("coming", {}, "이용자 화면에 '센터 직원이 자리로 가고 있어요'가 떠요.");
+  $("rep").onclick = () => { replyOpen = !replyOpen; $("replyBox").classList.toggle("open", replyOpen); if (replyOpen) $("txt").focus(); };
+  $("cancel").onclick = () => { replyOpen = false; file = null; renderNote(); };
+  $("fileIn").onchange = e => { file = e.target.files[0] || null; $("fname").textContent = file ? file.name : ""; $("drop").classList.toggle("has", !!file); };
+  $("send").onclick = async () => {
+    const text = $("txt").value.trim();
+    if (!text && !file) { toast("보낼 말이나 파일을 넣어 주세요."); return; }
+    if (file && file.size > 20 * 1024 * 1024) { toast("파일이 너무 커요. 20MB까지 보낼 수 있어요."); return; }
+    if (file && !/[.](csv|xlsx)$/i.test(file.name)) { toast("CSV나 엑셀(.xlsx) 파일만 보낼 수 있어요. 다른 파일은 표로 옮겨서 보내 주세요."); return; }
+    let b64 = "";
+    if (file) b64 = await new Promise(res => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1] || ""); r.readAsDataURL(file); });
+    await push("reply", {text, file_name: file ? file.name : "", file_b64: b64}, "보냈어요. 이용자 화면에 '몬딱 운영자'로 떠요.");
+  };
+}
+
+// 열어 본 문의 = 읽음(창이 앞에 있을 때만 — 그냥 켜져만 있으면 안 읽은 것으로 둠)
+function markRead(s) {
+  const it = items.find(i => i.session === s);
+  if (!it || it.read || !document.hasFocus()) return;
+  it.read = true;
+  api("/api/read", {session: s}).catch(() => {});
+}
+window.addEventListener("focus", () => { markRead(sel); render(); });
+
+// 답변을 쓰는 중에는 글이 지워지지 않게 오른쪽은 그대로
+function render() { renderList(); if (!replyOpen) renderNote(); }
+
+const monthKo = ym => ym ? `${ym.slice(0, 4)}년 ${Number(ym.slice(5, 7))}월` : "";
+
+async function refresh() {
+  try {
+    const d = await api("/api/items");
+    $("live").className = "live" + (d.alive ? "" : " off");
+    $("live").textContent = d.alive ? "알림 받는 중" : "알림 꺼짐 · 컴퓨터를 다시 켜 주세요";
+    const fresh = d.items.filter(i => seen && !seen.has(i.session));
+    seen = new Set(d.items.map(i => i.session));
+    items = d.items; oldDone = d.old_done || 0; clearDays = d.clear_days || 30;
+    await loadHistory();                                               // 보관 폴더에서 지운 파일도 바로 반영
+    // 11/17: 맨 위 문의를 저절로 열지 않음(열면 바로 '읽음'이 되어 안 읽은 문의가 안 보였음). 알림 [열기]로 온 문의만 바로 엶
+    if (first && sel) { const it = items.find(i => i.session === sel); if (it && HANDLED.includes(it.status)) tab = "done"; }
+    first = false;
+    markRead(sel);
+    if (fresh.length) toast(`새 문의 · ${fresh[0].seat} · ${fresh[0].want}`);
+    const gone = items.filter(i => i.status === "left" && lastStatus[i.session] && lastStatus[i.session] !== "left");
+    if (gone.length) toast(`${gone[0].seat} 이용자가 상담을 끝냈어요.`);
+    if (gone.some(i => i.session === sel)) { replyOpen = false; file = null; }      // 쓰던 답변은 받을 사람이 없음
+    lastStatus = Object.fromEntries(items.map(i => [i.session, i.status]));
+    render();
+  } catch (e) {
+    $("live").className = "live off"; $("live").textContent = "연결 끊김 · 컴퓨터를 다시 켜 주세요";
+  }
+}
+refresh(); setInterval(refresh, 3000);
+</script>
+</body></html>

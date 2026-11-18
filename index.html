@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>몬딱 데모</title>
+<link rel="icon" href="assets/mascot-profile.png">
+<link rel="stylesheet" href="site.css?v=11c91c16">
+</head>
+<body>
+<header class="top">
+  <a class="home-logo" href="#demo"><img src="assets/logo-64.png" srcset="assets/logo-64.png 1x, assets/logo-128.png 2x" alt="몬딱"></a>
+  <div class="bar"></div>
+  <div class="ttl"><b>제주 데이터 창구</b><span>팀 삼다수</span></div>
+  <nav><a href="#demo">데모</a><a href="#settings">직원 설정</a></nav>
+</header>
+
+<section class="demo" id="demo">
+  <div class="screen" id="screen">
+    <div class="shead">
+      <div class="seg" role="tablist">
+        <button class="on" data-tab="visitor" role="tab">이용자 화면</button>
+        <button data-tab="staff" role="tab">직원 화면<span class="badge hide" id="badge">0</span></button>
+      </div>
+      <button class="reset" id="reset">↺ 처음부터</button>
+    </div>
+    <div class="scaler" id="scaler">
+      <iframe id="f-visitor" src="visitor.html" title="몬딱 이용자 화면"></iframe>
+      <iframe id="f-staff" class="hide" src="staff.html" title="몬딱 직원 화면"></iframe>
+    </div>
+    <div class="alert hide" id="alert" role="alertdialog" aria-label="몬딱 새 문의">
+      <div class="pic"><img src="assets/mascot-small.png" alt=""></div>
+      <div class="body">
+        <span class="pill">몬딱 새 문의</span>
+        <div class="seat" id="al-seat"></div>
+        <dl><div><dt>찾는 것</dt><dd id="al-want"></dd></div><div><dt>상황</dt><dd id="al-why"></dd></div></dl>
+        <div class="btns"><button class="open" id="al-open">열기</button><button class="shut" id="al-shut">닫기</button></div>
+      </div>
+    </div>
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+</section>
+
+<div class="wrap">
+  <section class="settings" id="settings">
+    <h2>직원 설정</h2>
+    <form class="set-grid" id="set-form">
+      <fieldset>
+        <legend>몬딱 이미지</legend>
+        <div class="mascots">
+          <label class="mcard"><input type="radio" name="mascot" value="auto" checked><span class="mimg auto"><img class="a-base" src="assets/mascot-winter.png" alt=""><img class="a-summer" src="assets/mascot-summer.png" alt=""></span><b>자동</b></label>
+          <label class="mcard"><input type="radio" name="mascot" value="summer"><span class="mimg"><img src="assets/mascot-summer.png" alt=""></span><b>여름</b></label>
+          <label class="mcard"><input type="radio" name="mascot" value="winter"><span class="mimg"><img src="assets/mascot-winter.png" alt=""></span><b>겨울</b></label>
+        </div>
+      </fieldset>
+      <div class="set-col">
+        <fieldset>
+          <legend>자리 비움 제한 시간</legend>
+          <p class="line"><input type="number" name="idle_min" min="1" max="120" value="5" aria-label="알림까지 분">분 뒤 알림 · <input type="number" name="idle_sec" min="10" max="600" value="60" aria-label="종료까지 초">초 뒤 종료
+            <button type="button" class="ghost" id="idle-now">알림 보기</button></p>
+        </fieldset>
+        <fieldset>
+          <legend>분석실 PC 명칭</legend>
+          <p class="line"><input type="text" name="seat" value="분석실 3번" maxlength="20" aria-label="자리 이름"></p>
+        </fieldset>
+        <fieldset>
+          <legend>AI 비용 한도</legend>
+          <p class="line"><label class="check"><input type="checkbox" name="ai" checked>외부 AI 사용</label>
+            <span class="money">월 <input type="number" name="monthly" value="150000" step="10000" min="0" aria-label="월 한도">원 · 방문 <input type="number" name="visit" value="2000" step="500" min="0" aria-label="방문 한도">원</span></p>
+        </fieldset>
+      </div>
+      <div class="set-foot"><button class="save" type="submit" id="set-save" aria-live="polite">저장하기</button></div>
+    </form>
+  </section>
+</div>
+
+<footer>
+  <p class="c">2026 제주 AI·빅데이터 활용 AI Agent 개발 공모전 · 팀 삼다수</p>
+</footer>
+
+<script src="data.js?v=cb9f3511"></script>
+<script src="site.js?v=36b14e9c"></script>
+</body>
+</html>
