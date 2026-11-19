@@ -19,6 +19,11 @@
   const thumbOf = s => { for (const st of s.steps) { const m = st.add.find(x => x.chart); if (m) return "charts/" + st.charts[m.chart]; } return ""; };
   picks.innerHTML = D.scenarios.map(s => `<button type="button" class="demo-pick" data-pick="${esc(s.key)}">
     <span class="pt" style="background-image:url('${thumbOf(s)}')"></span><span class="pw"><b>${esc(s.title)}</b><small>${esc(s.field)} · ${esc(s.who)}</small></span></button>`).join("");
+  // 위 머리줄 빈 곳: 엔터 안내(데모에서만)
+  const tip = document.createElement("div");
+  tip.className = "demo-tip";
+  tip.innerHTML = '<kbd>Enter <span>&#8629;</span></kbd><span><b>엔터</b>만 누르셔도 다음 단계로 바로 넘어가요</span>';
+  const side = document.querySelector("header.top nav.side"); if (side) side.after(tip);
   let picked = "";
   picks.onclick = e => { const b = e.target.closest("[data-pick]"); if (!b) return; picked = b.dataset.pick; draw(); say.focus(); };
 
@@ -66,8 +71,8 @@
     if (e.t === "file") return {text: `${e.name} 올리기`, go: () => sendFile(e.name)};
     if (e.t === "plan_ok") return {text: "이대로 볼게요", go: () => click('[data-pc="ok"]')};
     if (e.t === "choice" || e.t === "box_yes") return {text: e.label, go: () => click(choiceBy(e.label))};
-    if (e.t === "basket") return {text: "", go: () => click("[data-bkgo]"), mark: "[data-bkgo]", hint: "오른쪽 반출 신청 단추를 눌러 주세요."};   // 채팅이 아니라 그 단추를 직접
-    if (e.t === "close") return {text: "", go: () => click("#b-close"), mark: "#b-close", hint: "오른쪽 위 이용 종료 단추를 눌러 주세요."};
+    if (e.t === "basket") return {text: "", go: null, mark: "[data-bkgo]", hint: "오른쪽 [반출 신청하기] 단추를 눌러 주세요."};   // 엔터·채팅이 아니라 그 단추를 직접 눌러야 진행
+    if (e.t === "close") return {text: "", go: null, mark: "#b-close", hint: "오른쪽 위 [이용 종료] 단추를 눌러 주세요."};   // 이것도 단추를 직접
     return null;
   }
   const inApp = st => st.on && !$("s-app").classList.contains("hide");
@@ -78,7 +83,7 @@
   function go() {
     if (quiet() || blocking()) return false;
     const nx = now();
-    if (!nx) return false;
+    if (!nx || !nx.go) return false;              // 단추를 직접 눌러야 하는 걸음(반출 신청하기·이용 종료)은 엔터로 안 넘어감
     nx.go();
     return true;
   }

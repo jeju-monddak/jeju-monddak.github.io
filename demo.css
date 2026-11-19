@@ -70,3 +70,11 @@
 @keyframes demo-pick-seq{0%,34%,100%{clip-path:inset(-40px round 18px);background:#fff;border-color:#ece5dd}
   17%{clip-path:inset(7px round 17px);background:#fff8f1;border-color:#f6c39a}}
 .demo-picks:not(:has(.on)) .demo-pick{animation-name:demo-pick-seq;animation-duration:3s}
+/* 머리줄 가운데 엔터 안내(새 상담과 돋보기 사이 빈 곳) */
+.demo-tip{margin-left:auto;display:flex;align-items:center;gap:12px;padding:8px 20px 8px 10px;border-radius:999px;
+  background:linear-gradient(180deg,#fffaf4,#fff1e3);border:1.5px solid #f6cfa8;color:#6b4423;font-size:18px;font-weight:700;white-space:nowrap;
+  box-shadow:0 2px 8px rgba(244,122,31,.10)}
+.demo-tip b{color:#e2680f;font-weight:800}
+.demo-tip kbd{font-family:inherit;font-size:15px;font-weight:800;color:#4a3524;background:#fff;border:1.5px solid #e6d3c0;border-bottom-width:4px;
+  border-radius:10px;padding:3px 11px;line-height:1.2;display:inline-flex;align-items:center;gap:5px}
+.demo-tip kbd span{font-size:17px;color:#e2680f}

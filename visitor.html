@@ -329,7 +329,7 @@ body.dragging .drop{transform:scale(1.02)}
 .close-m .mb p{margin:0;font-size:18px;color:var(--ink2)}
 .err{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#2b2622;color:#fff;border-radius:12px;padding:12px 18px;z-index:30;font-weight:700}
 </style>
-<link rel="stylesheet" href="demo.css?v=50a64e1f">
+<link rel="stylesheet" href="demo.css?v=f1db63d9">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute">
@@ -867,7 +867,7 @@ function basketSection() {
   return `<section><div class="shelf-h"><h3>${ICON("i-out")} 반출함</h3><small>가져갈 것만 체크</small></div>
     ${items.map(b => `<label class="bkrow ${bkSel[b.rid] ? "on" : ""}"><input type="checkbox" data-bk="${esc(b.rid)}" ${bkSel[b.rid] ? "checked" : ""}>
       <span title="${esc(b.title)}">${esc(b.title)}</span><button type="button" data-zoom="${esc(b.rid)}" title="크게 보기">${ICON("i-zoom")}</button></label>`).join("")}
-    <button class="btn bkgo" data-bkgo ${n ? "" : "disabled"}>고른 ${n}개 반출 신청</button><div id="ex"></div></section>`;
+    <button class="btn bkgo" data-bkgo ${n ? "" : "disabled"}>반출 신청하기</button><div id="ex"></div></section>`;
 }
 $("panel").onchange = e => {
   const c = e.target.closest("[data-bk]"); if (!c) return;
@@ -992,6 +992,6 @@ function render() {
 }
 boot().catch(e => toast(e.message));
 </script>
-<script src="visitor_bar.js?v=28d22065"></script>
+<script src="visitor_bar.js?v=02db7187"></script>
 </body>
 </html>
