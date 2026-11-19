@@ -95,7 +95,11 @@
     const nx = quiet() || !inApp(st) ? null : nextOf(st);
     const want = nx ? nx.text : "";
     if (quiet() || blocking() || helpBox()) { if (say.value) say.value = ""; }   // 몬딱이 답하는 동안·다른 창이 떠 있는 동안엔 비워 둠
-    else if (!PEND.length && say.value !== want) say.value = want;
+    else if (!PEND.length && say.value !== want) {
+      say.value = want;
+      say.style.fontSize = "";                                    // 긴 말(첫 질문)이 입력칸 끝에서 잘리지 않게 글씨를 조금씩 줄임
+      for (let fs = parseFloat(getComputedStyle(say).fontSize); say.scrollWidth > say.clientWidth && fs > 15; fs -= 1) say.style.fontSize = fs - 1 + "px";
+    }
     $("b-send").classList.toggle("demo-next", !!want);
     const mk = nx && nx.mark ? document.querySelector(nx.mark) : null;
     for (const el of document.querySelectorAll(".demo-next")) if (el !== mk && el.id !== "b-send" && el.id !== "b-help" && !el.closest(".veil")) el.classList.remove("demo-next");
