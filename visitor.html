@@ -60,6 +60,8 @@ svg.i{width:20px;height:20px;flex:none}
 .check{display:flex;align-items:center;gap:10px;margin-top:12px;font-weight:700;font-size:17px;cursor:pointer}
 .check input{width:22px;height:22px;accent-color:var(--o)}
 .who-box .row{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:12px}
+.who-box .noai{margin:14px 0 0;text-align:right}
+.linkish{border:0;background:none;padding:4px 2px;color:var(--ink2);font-size:15px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .ghost{border:1px solid var(--line);background:#fff;border-radius:999px;padding:11px 18px;font-weight:700}
 
 .bye{background:linear-gradient(#bfe3f5 0%,#e9f6fb 52%,#fff 100%);overflow:hidden}
@@ -129,12 +131,17 @@ svg.i{width:20px;height:20px;flex:none}
 .bub{background:#fff;border:1px solid var(--line);border-radius:4px 16px 16px 16px;padding:8px 13px;line-height:1.5;max-width:600px;white-space:pre-line;box-shadow:0 1px 2px rgba(80,50,20,.04)}
 /* 몬딱 말(11/17): 문장마다 한 줄, 항목은 점을 붙여 들여쓰기. 세 줄 이상이면 첫 줄(결론)만 굵게 */
 .bub.rich{white-space:normal;text-wrap:pretty}
-.bub.rich p{margin:0}
+.bub.rich p{margin:0;text-wrap:pretty}   /* 11/19: '볼 / 수 있어요'처럼 끝 낱말 하나만 다음 줄로 넘어가지 않게 */
+.bub.rich p.lead{text-wrap:balance}
 .bub.rich p+p{margin-top:5px}
 .bub.rich p.li{padding-left:1.1em;text-indent:-1.1em}
 .bub.rich p.li+p.li{margin-top:3px}
 .bub.rich p.lead{font-weight:700}
 .bub.rich p.src{font-size:14px;color:var(--sub);margin-top:7px}
+.cplink{border:0;background:none;padding:0;font:inherit;color:#c25a0b;text-decoration:underline;text-underline-offset:3px;cursor:copy;word-break:break-all;text-align:left}
+.cplink:hover{color:#f2700f}
+.cplink.done{color:#2f7d4f;text-decoration:none}
+.cplink.done::after{content:" ✓ 복사됨";font-weight:700}
 .time{font-size:14px;color:var(--mute);white-space:nowrap}
 .m.me{justify-content:flex-end}
 .m.cont{margin-top:-4px}
@@ -328,6 +335,7 @@ body.dragging .drop{transform:scale(1.02)}
 .close-m .mh{font-size:24px}
 .close-m .mb p{margin:0;font-size:18px;color:var(--ink2)}
 .err{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#2b2622;color:#fff;border-radius:12px;padding:12px 18px;z-index:30;font-weight:700}
+.err.ok{background:#2f7d4f}
 </style>
 <link rel="stylesheet" href="demo.css?v=f1db63d9">
 </head>
@@ -396,6 +404,7 @@ body.dragging .drop{transform:scale(1.02)}
       <label class="check"><input type="checkbox" id="agree"><span id="consent-check"></span></label></div>
     <div class="row"><button class="ghost" id="b-back">처음 화면으로</button>
       <button class="go" id="b-start" disabled><span>상담 시작하기</span><span class="arr"><svg class="i"><use href="#i-arrow"/></svg></span></button></div>
+    <p class="noai"><button class="linkish" id="b-noai">동의하지 않고 AI 없이 시작하기</button></p>
   </div>
 </section>
 
@@ -458,7 +467,7 @@ body.dragging .drop{transform:scale(1.02)}
 <div id="dropveil"><div>여기에 놓으세요<small>글 쓰는 칸 위에 붙어요. 보내기 전에 뺄 수 있어요.</small></div></div>
 <div id="lens"></div>
 
-<script src="data.js?v=dcbaf828"></script>
+<script src="data.js?v=a8a82554"></script>
 <script src="visitor_demo.js?v=5e3dbb1c"></script>
 <script>
 const $ = id => document.getElementById(id);
@@ -520,14 +529,18 @@ $("s-start").onclick = async () => {
   $("agree").checked = false; startLabel(); show("s-who");
 };
 $("b-back").onclick = () => show("s-start");
-/* 11/18 점검 11번: 동의하지 않아도 시작할 수 있게(그때는 AI 없이) — 단추 글자로 차이를 알림 */
-function startLabel() { $("b-start").disabled = false; $("b-start").firstElementChild.textContent = $("agree").checked ? "상담 시작하기" : "동의 없이 시작하기 (AI 없이)"; }
+/* 11/18 점검 11번: 동의하지 않아도 시작할 수 있게(그때는 AI 없이).
+   11/18 저녁: 큰 단추가 동의 없이도 눌려 다들 칸을 안 누르고 시작 → 'AI 쉬는 중'만 봄.
+   큰 단추는 동의해야 눌리고, 동의 없이 시작은 아래 작은 글자 단추로 따로 */
+function startLabel() { $("b-start").disabled = !$("agree").checked; }
 $("agree").onchange = startLabel;
-$("b-start").onclick = async () => {
-  try { V = await api("/api/start", {...prof, consent: $("agree").checked}); exportShown = false; exportAnimDone = false; bkSel = {};
+$("b-start").onclick = () => begin($("agree").checked);
+$("b-noai").onclick = () => begin(false);
+async function begin(consent) {
+  try { V = await api("/api/start", {...prof, consent}); exportShown = false; exportAnimDone = false; bkSel = {};
         PEND = []; drawTray(); navOn("new"); setBig(!!(CFG.screen && CFG.screen.magnifier)); idleAt = Date.now();   // 앞사람이 남긴 화면 상태 지우기
         show("s-app"); render(); $("say").focus(); } catch (e) { sayErr(e); }
-};
+}
 // 입력칸에 들어올 때마다 한글 모드로(11/07: 시작이 영어로 쳐진다는 지적). 이미 칸 안에 있으면 다시 바꾸지 않음
 let imeAt = 0;
 $("say").addEventListener("focus", () => {
@@ -733,7 +746,26 @@ function rich(text) {
     for (const sent of line.split(/(?<=[.?!])\s+(?=\S)/)) if (sent.trim()) rows.push({t: sent.trim()});
   }
   const lead = rows.length >= 3 && !rows[0].li && !rows[0].src;
-  return rows.map((r, i) => `<p class="${r.li ? "li" : r.src ? "src" : (lead && i === 0 ? "lead" : "")}">${esc(r.t)}</p>`).join("");
+  // 출처 줄의 주소는 누르면 복사(11/19: 허브 링크를 받아 적기 어렵다는 지적) — 창을 열지는 않음
+  const cell = r => (r.src || r.li) ? esc(r.t).replace(/https?:\/\/[^\s<]+/g, u => `<button class="cplink" data-url="${u}" title="누르면 주소가 복사돼요">${u}</button>`) : esc(r.t);
+  return rows.map((r, i) => `<p class="${r.li ? "li" : r.src ? "src" : (lead && i === 0 ? "lead" : "")}">${cell(r)}</p>`).join("");
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return true; } catch (e) { /* 아래 옛 방식 */ }
+  const a = document.createElement("textarea"); a.value = t; a.style.position = "fixed"; a.style.opacity = "0";
+  document.body.appendChild(a); a.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (e) { ok = false; } a.remove(); return ok;
+}
+document.addEventListener("click", async e => {
+  const b = e.target.closest(".cplink"); if (!b) return;
+  e.preventDefault();
+  const ok = await copyText(b.dataset.url.replace(/&amp;/g, "&"));
+  b.classList.toggle("done", ok);
+  toastOk(ok ? "주소를 복사했어요. 인터넷 창 주소칸에 붙여 넣으세요." : "복사하지 못했어요. 주소를 보고 직접 적어 주세요.");
+  setTimeout(() => b.classList.remove("done"), 1600);
+});
+function toastOk(msg) {
+  const d = document.createElement("div"); d.className = "err ok"; d.textContent = msg; document.body.appendChild(d);
+  setTimeout(() => d.remove(), 2600);
 }
 function guideCard(g) {
   const li = g.steps.map((s, i) => `<li><span class="n">${i + 1}</span><div><b>${esc(s.head)}</b>${s.sub ? `<small>${esc(s.sub)}</small>` : ""}
@@ -992,6 +1024,6 @@ function render() {
 }
 boot().catch(e => toast(e.message));
 </script>
-<script src="visitor_bar.js?v=02db7187"></script>
+<script src="visitor_bar.js?v=24765818"></script>
 </body>
 </html>

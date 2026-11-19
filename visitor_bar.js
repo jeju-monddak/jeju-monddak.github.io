@@ -130,7 +130,9 @@
     const box = document.querySelector("#layer .demo-box");                    // 신청함 보기 창: 엔터로 닫기
     if (box) { box.closest(".veil").remove(); return true; }
     if (shown("s-start")) { $("b-go").click(); return true; }
-    if (shown("s-who")) {                                                       // 아무것도 안 골랐으면 '동의 없이 시작'으로
+    if (shown("s-who")) {                                                       // 엔터 한 번: 동의 칸 체크(눈에 보이게) → 한 번 더: 상담 시작
+      const ag = $("agree");
+      if (ag && !ag.checked) { ag.checked = true; ag.dispatchEvent(new Event("change", {bubbles: true})); ag.closest("label") && ag.closest("label").scrollIntoView({block: "nearest"}); return true; }
       if ($("b-start").disabled && typeof startLabel === "function") startLabel();
       if (!$("b-start").disabled) { $("b-start").click(); return true; }
       return false;
