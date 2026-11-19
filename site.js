@@ -35,6 +35,7 @@
     fs.classList.toggle("hide", name !== "staff");
     for (const b of document.querySelectorAll(".seg button")) b.classList.toggle("on", b.dataset.tab === name);
     if (name === "staff") { unread = 0; badge(); try { fs.contentWindow.focus(); } catch (e) { /* */ } }
+    if (name === "visitor") { try { fv.contentWindow.focus(); } catch (e) { /* */ } toVisitor({t: "focus"}); }   // 키보드(엔터)도 이용자 화면으로
   }
   function badge() { $("badge").textContent = unread; $("badge").classList.toggle("hide", !unread); }
   document.querySelector(".seg").onclick = e => { const b = e.target.closest("button"); if (b) showTab(b.dataset.tab); };
@@ -71,15 +72,19 @@
       if (m.t === "left") toStaff(m);
       if (m.t === "visit") { toStaff(m); toast("방문 내역이 직원 화면 보관함에 쌓였어요", () => showTab("staff")); }
       if (m.t === "show_staff") showTab("staff");
+      if (m.t === "enter_staff") { if (!$("alert").classList.contains("hide")) $("al-open").click(); else showTab("staff"); }   // 직원 답을 기다릴 때 엔터: 알림 [열기]
     }
+    if (m.from === "staff" && m.t === "enter" && fs.classList.contains("hide")) { showTab("visitor"); toVisitor({t: "enter"}); }
     if (m.from === "staff" && m.t === "push") { toVisitor(m); toast("이용자 화면에 전했어요", () => showTab("visitor")); showTab("visitor"); fv.classList.remove("fade-in"); void fv.offsetWidth; fv.classList.add("fade-in"); }
   });
 
-  // 바깥에서 엔터를 눌러도 이용자 화면의 다음 걸음이 이어지게
+  // 바깥에서 엔터를 눌러도 다음 걸음이 이어지게: 알림이 떠 있으면 [열기], 아니면 보이는 화면으로
   document.addEventListener("keydown", e => {
-    if (e.key !== "Enter" || e.isComposing || fv.classList.contains("hide")) return;
+    if (e.key !== "Enter" || e.isComposing) return;
     if (e.target.closest && e.target.closest("input,textarea,select,button,a,form")) return;
     e.preventDefault();
+    if (!$("alert").classList.contains("hide")) { $("al-open").click(); return; }
+    if (!fs.classList.contains("hide")) { try { fs.contentWindow.focus(); } catch (e2) { /* */ } toStaff({t: "enter"}); return; }
     try { fv.contentWindow.focus(); } catch (e2) { /* */ }
     toVisitor({t: "enter"});
   });

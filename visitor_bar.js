@@ -103,23 +103,45 @@
     for (const b of picks.querySelectorAll("[data-pick]")) b.classList.toggle("on", b.dataset.pick === (picked || st.only));
     const waiting = st.expect && st.expect.t === "staff";
     $("b-help").classList.toggle("demo-next", !!(st.expect && st.expect.t === "help") && !helpBox());
+    const hb = helpBox();                   // 직원 도움을 마우스로 열었어도 이 예시의 까닭을 미리 골라 두고 [직원 부르기]를 반짝임
+    if (hb && st.expect && st.expect.t === "help" && !hb.dataset.demoPre) {
+      hb.dataset.demoPre = "1";
+      const c = [...hb.querySelectorAll("[data-r]")].find(x => x.dataset.r === st.expect.why);
+      if (c && !c.classList.contains("on")) c.click();
+      const g = hb.querySelector('[data-k="go"]'); if (g) g.classList.add("demo-next");
+    }
     const ph = start && !want ? HINT : waiting ? "직원 화면에서 답해 주세요." : nx && nx.hint ? nx.hint : "";
     if (say.placeholder !== ph && !PEND.length) say.placeholder = ph;
     if (want && document.hasFocus() && document.activeElement === document.body) say.focus();
   }
   new MutationObserver(() => { if (!PEND.length) draw(); }).observe(say, {attributes: true, attributeFilter: ["placeholder"]});
 
-  // 엔터: 입력칸에 적힌 다음 걸음 진행
+  // 엔터: 지금 화면에서 다음에 누를 것을 누름(입력칸에 적힌 다음 걸음, 첫 화면·동의 화면·끝 화면 단추, 직원 도움 창)
+  const toSite = m => { try { parent.postMessage(Object.assign({monddak: 1, from: "visitor"}, m), "*"); } catch (e) { /* 혼자 열었을 때 */ } };
+  const shown = id => { const el = $(id); return !!el && !el.classList.contains("hide"); };
+  function enter() {
+    const hb = helpBox(), st = window.DEMO_STATE();
+    if (hb) { if (st.expect && st.expect.t === "help") { hb.querySelector('[data-k="go"]').click(); return true; } return false; }
+    const box = document.querySelector("#layer .demo-box");                    // 신청함 보기 창: 엔터로 닫기
+    if (box) { box.closest(".veil").remove(); return true; }
+    if (shown("s-start")) { $("b-go").click(); return true; }
+    if (shown("s-who")) {                                                       // 아무것도 안 골랐으면 '동의 없이 시작'으로
+      if ($("b-start").disabled && typeof startLabel === "function") startLabel();
+      if (!$("b-start").disabled) { $("b-start").click(); return true; }
+      return false;
+    }
+    if (shown("s-bye")) { $("b-again").click(); return true; }
+    if (blocking()) return false;
+    if (inApp(st) && st.expect && st.expect.t === "staff") { toSite({t: "enter_staff"}); return true; }   // 직원 답을 기다리는 중: 직원 쪽으로
+    return go();
+  }
   window.addEventListener("keydown", e => {
     if (e.key !== "Enter" || e.isComposing || e.shiftKey) return;
     const a = document.activeElement;
-    const hb = helpBox(), st0 = window.DEMO_STATE();
-    if (hb && st0.expect && st0.expect.t === "help") { e.preventDefault(); e.stopPropagation(); hb.querySelector('[data-k="go"]').click(); return; }
-    if (a && a !== say && /^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)) return;
-    if (blocking()) return;
-    if (!now()) return;
-    e.preventDefault(); e.stopPropagation();
-    go();
+    const typing = a && a !== say && (a.tagName === "TEXTAREA" || a.tagName === "SELECT" || (a.tagName === "INPUT" && !/^(checkbox|radio|file)$/.test(a.type)));
+    if (typing && !(helpBox() && a.closest(".veil") === helpBox())) return;    // 직원 도움 창의 메모칸에서도 엔터는 '직원 부르기'
+    if (quiet()) { e.preventDefault(); e.stopPropagation(); return; }           // 몬딱이 답하는 중: 기다림
+    if (enter()) { e.preventDefault(); e.stopPropagation(); }
   }, true);
   // 보내기 단추도 같은 일(화면 본래의 보내기로는 녹화에 없는 말이 가므로 가로챔)
   document.addEventListener("submit", e => {
@@ -130,7 +152,8 @@
   // 바깥(데모 페이지)에서 엔터를 눌렀을 때
   window.addEventListener("message", ev => {
     const m = ev.data;
-    if (m && m.monddak && m.from === "site" && m.t === "enter") { say.focus(); go(); }
+    if (m && m.monddak && m.from === "site" && m.t === "enter") { say.focus(); if (!quiet()) enter(); }
+    if (m && m.monddak && m.from === "site" && m.t === "focus") say.focus();
     if (m && m.monddak && m.from === "site" && m.t === "scenario") picked = m.key || "";
     if (m && m.monddak && m.from === "site" && m.t === "scenario") setTimeout(() => { say.focus(); draw(); }, 400);
   });

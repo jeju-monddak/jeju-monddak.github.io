@@ -162,5 +162,24 @@
     const i = find(sel);
     if (i && i.demo_reply) { t.value = i.demo_reply; t.dataset.demo = sel; }
   }).observe(document.body, {childList: true, subtree: true});
+  // 엔터: 열린 문의에서 [자리로 가기], 답변 칸이 열려 있으면 [보내기](줄바꿈은 Shift+엔터). 직원 화면이 숨어 있으면 바깥으로
+  const hiddenNow = () => { try { return !!(window.frameElement && window.frameElement.classList.contains("hide")); } catch (e) { return false; } };
+  function staffEnter() {
+    const q = id => document.getElementById(id);
+    if (hiddenNow()) { hub({t: "enter"}); return true; }
+    const box = q("replyBox");
+    if (box && box.classList.contains("open")) { if (q("send")) { q("send").click(); return true; } return false; }
+    const g = q("go");
+    if (g && !g.disabled) { g.click(); return true; }
+    return false;
+  }
+  window.addEventListener("keydown", e => {
+    if (e.key !== "Enter" || e.isComposing || e.shiftKey) return;
+    const a = document.activeElement;
+    if (a && /^(rep|send|cancel|go)$/.test(a.id)) return;                       // 그 단추에 초점: 브라우저가 그 단추를 누름
+    if (a && a.id !== "txt" && (a.tagName === "TEXTAREA" || a.tagName === "SELECT" || a.tagName === "INPUT")) return;
+    if (staffEnter()) { e.preventDefault(); e.stopPropagation(); }
+  }, true);
+  window.addEventListener("message", ev => { const m = ev.data; if (m && m.monddak && m.from === "site" && m.t === "enter") staffEnter(); });
   hub({t: "staff_ready"});
 })();
