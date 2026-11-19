@@ -78,7 +78,8 @@ main{flex:1;display:grid;grid-template-columns:380px minmax(0,1fr);gap:12px;min-
 .q:hover{background:var(--side)}
 .q:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .q.on{outline:3px solid var(--o);outline-offset:-1px}                 /* 지금 열어 본 문의 */
-.q .meta{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--sub)}
+.q .meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;font-size:15px;color:var(--sub)}
+.q .meta .when{order:9;flex-basis:100%;white-space:nowrap;font-size:14.5px}   /* 둘째 줄: 자리 이름·상태 아래에 날짜와 시각 */
 .q .meta b{color:#c3570a;font-weight:800}
 .q .meta .new,.q .meta .left,.q .meta .done{margin-left:auto;font-size:14px;font-weight:700;border-radius:8px;padding:3px 9px}
 .q .meta .new{color:#fff;background:var(--o)}                       /* 안 읽음 */
@@ -198,6 +199,8 @@ function memoParts(memo) {        // 정리문 글 → 받은 시각·소제목�
 const HANDLED = ["coming", "replied", "done", "left"];
 const inbox = () => items.filter(i => !HANDLED.includes(i.status));
 const doneList = () => items.filter(i => HANDLED.includes(i.status)).sort((a, b) => String(b.updated || "").localeCompare(String(a.updated || "")));
+// 문의 카드의 때: "2026년 11월 19일 13:39"(11/19: 시간만 있어 며칠 전 문의인지 모른다는 지적)
+const when = t => { const m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2})/.exec(t || ""); return m ? `${m[1]}년 ${+m[2]}월 ${+m[3]}일 ${m[4]}` : String(t || "").slice(-5); };
 const doneTime = i => ((i.history || []).filter(h => h.kind === "done").pop() || {}).time || "";
 const lastTime = i => ((i.history || []).slice(-1)[0] || {}).time || "";
 
@@ -248,7 +251,7 @@ function renderList() {
         const pk = tab === "done" && picking;
         return `
       <button class="q ${(tab === "done" && i.status !== "left") || i.read ? "read" : "unread"} s-${esc(i.status)} ${!pk && i.session === sel ? "on" : ""} ${pk && picked.has(i.session) ? "picked" : ""}" data-s="${esc(i.session)}">
-        <span class="meta">${pk ? `<span class="ck">${picked.has(i.session) ? "✓" : ""}</span>` : ""}<b>${esc(i.seat)}</b>${esc((i.time || "").slice(-5))}${tagOf(i)}</span>
+        <span class="meta">${pk ? `<span class="ck">${picked.has(i.session) ? "✓" : ""}</span>` : ""}<b>${esc(i.seat)}</b><span class="when">${esc(when(i.time))}</span>${tagOf(i)}</span>
         <span class="want">${esc(i.want)}</span>
         ${i.why ? `<span class="why">${esc(i.why)}</span>` : ""}
       </button>`; }).join("") : `<p class="none">${tab === "done" ? "처리 완료한 문의가 아직 없어요." : "지금 남은 문의가 없어요."}</p>`);
