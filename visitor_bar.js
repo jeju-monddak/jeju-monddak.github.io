@@ -71,8 +71,8 @@
     if (e.t === "file") return {text: `${e.name} 올리기`, go: () => sendFile(e.name)};
     if (e.t === "plan_ok") return {text: "이대로 볼게요", go: () => click('[data-pc="ok"]')};
     if (e.t === "choice" || e.t === "box_yes") return {text: e.label, go: () => click(choiceBy(e.label))};
-    if (e.t === "basket") return {text: "", go: null, mark: "[data-bkgo]", hint: "오른쪽 [반출 신청하기] 단추를 눌러 주세요."};   // 엔터·채팅이 아니라 그 단추를 직접 눌러야 진행
-    if (e.t === "close") return {text: "", go: null, mark: "#b-close", hint: "오른쪽 위 [이용 종료] 단추를 눌러 주세요."};   // 이것도 단추를 직접
+    if (e.t === "basket") return {text: "", go: () => click("[data-bkgo]"), mark: "[data-bkgo]", hint: "엔터를 누르거나 오른쪽 [반출 신청하기] 단추를 눌러 주세요."};   // 채팅에 말을 적지 않고 그 단추를 누름(엔터도 같은 일)
+    if (e.t === "close") return {text: "", go: () => click("#b-close"), mark: "#b-close", hint: "엔터를 누르거나 오른쪽 위 [이용 종료] 단추를 눌러 주세요."};   // 이것도 그 단추를 누름
     return null;
   }
   const inApp = st => st.on && !$("s-app").classList.contains("hide");
@@ -83,7 +83,7 @@
   function go() {
     if (quiet() || blocking()) return false;
     const nx = now();
-    if (!nx || !nx.go) return false;              // 단추를 직접 눌러야 하는 걸음(반출 신청하기·이용 종료)은 엔터로 안 넘어감
+    if (!nx || !nx.go) return false;
     nx.go();
     return true;
   }
