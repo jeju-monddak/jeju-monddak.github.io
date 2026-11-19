@@ -181,5 +181,11 @@
     if (staffEnter()) { e.preventDefault(); e.stopPropagation(); }
   }, true);
   window.addEventListener("message", ev => { const m = ev.data; if (m && m.monddak && m.from === "site" && m.t === "enter") staffEnter(); });
+  const head = document.querySelector("header .logo");
+  if (head) {
+    const tip = document.createElement("div"); tip.className = "demo-tip staff";
+    tip.innerHTML = '<kbd>Enter <span>&#8629;</span></kbd><span><b>엔터</b>를 누르면 [자리로 가기]로 바로 넘어가요</span>';
+    head.after(tip);
+  }
   hub({t: "staff_ready"});
 })();

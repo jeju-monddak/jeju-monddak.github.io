@@ -75,7 +75,7 @@
       if (m.t === "enter_staff") { if (!$("alert").classList.contains("hide")) $("al-open").click(); else showTab("staff"); }   // 직원 답을 기다릴 때 엔터: 알림 [열기]
     }
     if (m.from === "staff" && m.t === "enter" && fs.classList.contains("hide")) { showTab("visitor"); toVisitor({t: "enter"}); }
-    if (m.from === "staff" && m.t === "push") { toVisitor(m); toast("이용자 화면에 전했어요", () => showTab("visitor")); showTab("visitor"); fv.classList.remove("fade-in"); void fv.offsetWidth; fv.classList.add("fade-in"); }
+    if (m.from === "staff" && m.t === "push") { toVisitor(m); showTab("visitor"); fv.classList.remove("fade-in"); void fv.offsetWidth; fv.classList.add("fade-in"); }
   });
 
   // 바깥에서 엔터를 눌러도 다음 걸음이 이어지게: 알림이 떠 있으면 [열기], 아니면 보이는 화면으로

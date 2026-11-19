@@ -24,6 +24,14 @@
   tip.className = "demo-tip";
   tip.innerHTML = '<kbd>Enter <span>&#8629;</span></kbd><span><b>엔터</b>만 누르셔도 다음 단계로 바로 넘어가요</span>';
   const side = document.querySelector("header.top nav.side"); if (side) side.after(tip);
+  // 첫 화면·동의 화면에도 같은 모양의 엔터 안내(화면마다 엔터가 하는 일이 달라서 글은 따로)
+  const KEY = '<kbd>Enter <span>&#8629;</span></kbd>';
+  const tipOf = html => { const d = document.createElement("div"); d.className = "demo-tip inline"; d.innerHTML = KEY + "<span>" + html + "</span>"; return d; };
+  const h0 = document.querySelector("#s-start .hint");
+  if (h0) h0.after(tipOf("<b>엔터</b>를 눌러도 시작돼요"));
+  const row0 = document.querySelector("#s-who .row"), tipWho = tipOf("");
+  const whoText = () => { tipWho.lastElementChild.innerHTML = $("agree").checked ? "<b>엔터</b>를 누르면 상담이 시작돼요" : "<b>엔터</b>를 누르면 동의 칸이 체크돼요"; };
+  if (row0) { row0.before(tipWho); whoText(); $("agree").addEventListener("change", whoText); $("b-again").addEventListener("click", () => setTimeout(whoText, 0)); }
   let picked = "";
   picks.onclick = e => { const b = e.target.closest("[data-pick]"); if (!b) return; picked = b.dataset.pick; draw(); say.focus(); };
 
@@ -119,7 +127,7 @@
       if (c && !c.classList.contains("on")) c.click();
       const g = hb.querySelector('[data-k="go"]'); if (g) g.classList.add("demo-next");
     }
-    const ph = start && !want ? HINT : waiting ? "직원 화면에서 답해 주세요." : nx && nx.hint ? nx.hint : "";
+    const ph = start && !want ? HINT : waiting ? "엔터를 누르면 직원 화면으로 넘어가요." : nx && nx.hint ? nx.hint : "";
     if (say.placeholder !== ph && !PEND.length) say.placeholder = ph;
     if (want && document.hasFocus() && document.activeElement === document.body) say.focus();
   }

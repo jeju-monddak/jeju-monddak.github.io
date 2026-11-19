@@ -78,3 +78,7 @@
 .demo-tip kbd{font-family:inherit;font-size:15px;font-weight:800;color:#4a3524;background:#fff;border:1.5px solid #e6d3c0;border-bottom-width:4px;
   border-radius:10px;padding:3px 11px;line-height:1.2;display:inline-flex;align-items:center;gap:5px}
 .demo-tip kbd span{font-size:17px;color:#e2680f}
+/* 첫 화면·동의 화면·직원 화면의 엔터 안내 */
+.demo-tip.inline{margin:16px 0 0;width:fit-content}
+#s-who .demo-tip.inline{margin:14px 0 0 auto}
+.demo-tip.staff{margin:0 auto}

@@ -155,7 +155,7 @@ textarea:focus{outline:none;border-color:var(--o);box-shadow:0 0 0 3px rgba(244,
 .cplink{border:0;background:none;padding:0;font:inherit;color:#c25a0b;text-decoration:underline;text-underline-offset:3px;cursor:copy;word-break:break-all;text-align:left}
 .cplink:hover{color:#f2700f}
 </style>
-<link rel="stylesheet" href="demo.css?v=f1db63d9"></head>
+<link rel="stylesheet" href="demo.css?v=8f0c935e"></head>
 <body>
 <header>
   <span class="logo"><img src="assets/logo-64.png" srcset="assets/logo-64.png 1x, assets/logo-128.png 2x, assets/logo-192.png 3x" alt="몬딱"><small>직원 문의함</small></span>
@@ -166,8 +166,8 @@ textarea:focus{outline:none;border-color:var(--o);box-shadow:0 0 0 3px rgba(244,
   <section class="note" id="note"></section>
 </main>
 <div class="toast" id="toast" role="status"></div>
-<script src="data.js?v=befa328e"></script>
-<script src="staff_demo.js?v=42f757ea"></script>
+<script src="data.js?v=b1b8fdfd"></script>
+<script src="staff_demo.js?v=c2366d3b"></script>
 <script>
 const KO = {new:"새 문의", coming:"자리로 방문", replied:"답변 완료", done:"처리 완료", left:"상담 끝남"};
 const P = new URLSearchParams(location.hash.slice(1));
@@ -235,7 +235,7 @@ function tagOf(i) {
 function renderList() {
   const box = inbox(), fin = doneList(), shown = tab === "done" ? fin : box;
   const n = box.filter(i => !i.read).length;
-  if (tab !== "arc" && sel && !shown.some(i => i.session === sel)) sel = "";      // 다른 탭의 문의는 닫음
+  if (!first && tab !== "arc" && sel && !shown.some(i => i.session === sel)) sel = "";      // 다른 탭의 문의는 닫음(첫 목록을 받기 전에는 그대로 — 알림 창에서 고른 문의를 잃지 않게, 11/19)
   for (const s of [...picked]) if (!fin.some(i => i.session === s)) picked.delete(s);
   const leftNew = fin.filter(i => i.status === "left" && !i.read).length;    /* 11/18 점검 6번: 안 읽은 '상담 끝남'이 처리 완료 탭에서 눈에 띄게 */
   const tabs = `<div class="tabs" role="tablist">
