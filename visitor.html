@@ -56,7 +56,7 @@ svg.i{width:20px;height:20px;flex:none}
 .chip:hover{border-color:var(--o)}
 .chip.on{background:var(--o);border-color:var(--o);color:#fff}
 .consent{margin-top:20px;border:1px solid var(--line);background:var(--side);border-radius:16px;padding:14px 18px}
-.consent pre{margin:0;font-family:inherit;white-space:pre-wrap;font-size:14.5px;line-height:1.6;color:var(--ink2);max-height:190px;overflow:auto}
+.consent pre{margin:0;font-family:inherit;white-space:pre-wrap;font-size:15.5px;line-height:1.6;color:var(--ink2);max-height:210px;overflow:auto}
 .check{display:flex;align-items:center;gap:10px;margin-top:12px;font-weight:700;font-size:17px;cursor:pointer}
 .check input{width:22px;height:22px;accent-color:var(--o)}
 .who-box .row{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:12px}
@@ -133,11 +133,12 @@ svg.i{width:20px;height:20px;flex:none}
 .bub.rich{white-space:normal;text-wrap:pretty}
 .bub.rich p{margin:0;text-wrap:pretty}   /* 11/19: '볼 / 수 있어요'처럼 끝 낱말 하나만 다음 줄로 넘어가지 않게 */
 .bub.rich p.lead{text-wrap:balance}
+.bub,.card .big,.card .why,.card li,.choice,.guide b,.guide small,.banner,.modal p,.callcard dd,.pfile b{text-wrap:pretty}   /* 11/19 전수 점검 */
 .bub.rich p+p{margin-top:5px}
 .bub.rich p.li{padding-left:1.1em;text-indent:-1.1em}
 .bub.rich p.li+p.li{margin-top:3px}
 .bub.rich p.lead{font-weight:700}
-.bub.rich p.src{font-size:14px;color:var(--sub);margin-top:7px}
+.bub.rich p.src{font-size:15.5px;color:var(--sub);margin-top:7px}
 .cplink{border:0;background:none;padding:0;font:inherit;color:#c25a0b;text-decoration:underline;text-underline-offset:3px;cursor:copy;word-break:break-all;text-align:left}
 .cplink:hover{color:#f2700f}
 .cplink.done{color:#2f7d4f;text-decoration:none}
@@ -155,13 +156,13 @@ svg.i{width:20px;height:20px;flex:none}
 .chart img{display:block;height:min(42vh,460px);max-width:100%;object-fit:contain;border-radius:14px;cursor:zoom-in;
   box-shadow:0 1px 2px rgba(80,50,20,.06),0 6px 18px rgba(80,50,20,.08)}
 .mini{position:absolute;right:12px;bottom:12px}   /* 11/07: 위에 두면 그림 제목을 가림 → 오른쪽 아래(출처 줄 옆) */
-.mini button{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:rgba(255,255,255,.92);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700}
+.mini button{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:rgba(255,255,255,.92);border-radius:999px;padding:6px 12px;font-size:15px;font-weight:700}
 .mini button svg.i{width:16px;height:16px}
 .choices{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 0 60px;max-width:760px}
 .bkrow{display:flex;gap:9px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:6px;font-size:15px;cursor:pointer}
 .bkrow.on{border-color:#f3b483;background:#fffaf5}
 .bkrow input{width:22px;height:22px;flex:none;accent-color:var(--o)}
-.bkrow span{flex:1;min-width:0;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bkrow span{flex:1;min-width:0;font-weight:600;line-height:1.35;word-break:keep-all;overflow-wrap:anywhere;text-wrap:pretty}   /* 11/19: 제목이 두 줄에서 잘리지 않게 */
 .bkrow button{border:0;background:transparent;color:var(--o);padding:2px;flex:none}
 .bkgo{width:100%;margin-top:4px}
 .bkgo[disabled]{background:#e0d8d0}
@@ -179,9 +180,9 @@ svg.i{width:20px;height:20px;flex:none}
 .guide li:first-child{border-top:0}
 .guide .n{flex:0 0 26px;height:26px;border-radius:50%;background:var(--o);color:#fff;font-weight:800;font-size:14px;display:grid;place-items:center;margin-top:1px}
 .guide b{display:block;font-size:16px;font-weight:800;color:var(--ink);line-height:1.35}
-.guide small{display:block;font-size:14px;color:var(--sub);margin-top:2px;line-height:1.4;word-break:keep-all}
+.guide small{display:block;font-size:15.5px;color:var(--sub);margin-top:2px;line-height:1.4;word-break:keep-all}
 .guide .tb{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
-.guide .tb span{background:var(--ol2);border:1px solid #f6d3b3;color:#a24d0a;border-radius:8px;padding:2px 9px;font-size:14px;font-weight:700;word-break:keep-all}
+.guide .tb span{background:var(--ol2);border:1px solid #f6d3b3;color:#a24d0a;border-radius:8px;padding:2px 9px;font-size:15px;font-weight:700;word-break:keep-all}
 .guide .end{margin-top:8px;padding:8px 11px;border-radius:10px;background:var(--ol2);color:#a24d0a;font-weight:700;font-size:15px;display:flex;align-items:center;gap:7px}
 .typing .dots span{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:#c8bfb6;animation:b 1s infinite}
 .typing .dots span:nth-child(2){animation-delay:.15s}.typing .dots span:nth-child(3){animation-delay:.3s}
@@ -202,7 +203,7 @@ svg.i{width:20px;height:20px;flex:none}
 .manual select{font-family:inherit;font-size:16px;padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:#fff}
 .manual .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-.phint{display:flex;align-items:center;gap:6px;margin:8px 2px 0;color:var(--sub);font-size:14px;line-height:1.4}
+.phint{display:flex;align-items:center;gap:6px;margin:8px 2px 0;color:var(--sub);font-size:15.5px;line-height:1.4}
 .phint svg.i{width:16px;height:16px;color:var(--o);flex:none}
 #dropveil{position:fixed;inset:10px;z-index:35;display:none;place-items:center;border:3px dashed var(--o);border-radius:26px;
   background:rgba(255,244,234,.9);pointer-events:none}
@@ -467,7 +468,7 @@ body.dragging .drop{transform:scale(1.02)}
 <div id="dropveil"><div>여기에 놓으세요<small>글 쓰는 칸 위에 붙어요. 보내기 전에 뺄 수 있어요.</small></div></div>
 <div id="lens"></div>
 
-<script src="data.js?v=1055e342"></script>
+<script src="data.js?v=befa328e"></script>
 <script src="visitor_demo.js?v=5e3dbb1c"></script>
 <script>
 const $ = id => document.getElementById(id);
@@ -747,7 +748,10 @@ function rich(text) {
   }
   const lead = rows.length >= 3 && !rows[0].li && !rows[0].src;
   // 출처 줄의 주소는 누르면 복사(11/19: 허브 링크를 받아 적기 어렵다는 지적) — 창을 열지는 않음
-  const cell = r => (r.src || r.li) ? esc(r.t).replace(/https?:\/\/[^\s<]+/g, u => `<button class="cplink" data-url="${u}" title="누르면 주소가 복사돼요">${u}</button>`) : esc(r.t);
+  const cell = r => (r.src || r.li) ? esc(r.t).replace(/https?:\/\/[A-Za-z0-9\-._~:\/?#\[\]@!$&'()*+,;=%]+/g, m => {
+    const u = m.replace(/(?:&#39;|&quot;|[.,;:!?)\]'])+$/, "");      // 11/19: "…/123에서", "…/123)."처럼 뒤에 붙은 글자는 빼고 복사
+    return `<button class="cplink" data-url="${u}" title="누르면 주소가 복사돼요">${u}</button>` + m.slice(u.length);
+  }) : esc(r.t);
   return rows.map((r, i) => `<p class="${r.li ? "li" : r.src ? "src" : (lead && i === 0 ? "lead" : "")}">${cell(r)}</p>`).join("");
 }
 async function copyText(t) {
@@ -834,6 +838,7 @@ $("msgs").onclick = e => {
   const c = e.target.closest("[data-c]");
   if (c) { const ch = CHOICES[+c.dataset.c];
     if ("box" in ch) return act("/api/basket_ok", {ok: ch.box}, ch.label);
+    if (ch.value === CFG.labels.close) return closeModal();   // 11/19 전수 점검: 보기의 '이용 종료'도 위쪽 단추와 똑같이 확인 창 → 끝 화면
     return act("/api/resume", {value: ch.value}, ch.label); }
   const cv = e.target.closest("#cv .chip"); if (cv) return cv.classList.toggle("on");
   if (e.target.closest("[data-cv-ok]")) { const v = [...document.querySelectorAll("#cv .chip.on")].map(x => x.dataset.v); return act("/api/resume", {value: v}, v.join(", ") || "고르지 않음"); }

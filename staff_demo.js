@@ -10,10 +10,10 @@
   const hub = msg => { try { parent.postMessage(Object.assign({monddak: 1, from: "staff"}, msg), "*"); } catch (e) { /* */ } };
   const CLEAR_DAYS = 30;
   const HANDLED = ["coming", "replied", "done", "left"];
-  const KO = {coming: "자리로 가는 중이라고 알림", reply: "직접 답변", done: "처리 완료", left: "이용자가 상담을 끝냄"};
+  const KO = {coming: "자리로 간다고 알림", reply: "직접 답변", done: "처리 완료", left: "이용자가 상담을 끝냄"};
 
   const memoOf = (seat, when, want, facts) => `[문의 정리문] ${want}\n자리: ${seat} · 작성 ${when} · 방문 표식 demo0000 · 사유: 이용자가 직원 도움을 요청했어요\n\n` +
-    `■ 이용자가 원하는 것\n${want}\n\n■ 직원에게 부탁드릴 일\n- 이용자와 직접 이야기해 주세요.\n\n■ 확인 정보 (센터 PC가 적음)\n${facts.map(f => "- " + f).join("\n")}\n`;
+    `■ 이용자가 원하는 것\n${want}\n\n■ 직원에게 부탁드릴 일\n- 이용자와 직접 이야기해 주세요.\n\n■ 확인 정보 (몬딱이 적음)\n${facts.map(f => "- " + f).join("\n")}\n`;
   function seedItem(n, seat, days, h, m, want, why, kind, text, facts) {
     const time = ago(days, h, m), at = ago(days, h, m + 6);
     return {session: ("demo" + n).padEnd(32, "0"), seat, title: want, memo: memoOf(seat, time, want, facts), card: {want, why}, time,
@@ -23,12 +23,12 @@
   const items = [
     seedItem(1, "분석실 2번", 1, 15, 20, "서귀포 감귤 생산량이 해마다 어땠는지 알고 싶어 해요.", "찾는 자료가 없어요", "reply",
              "센터 표에는 없지만 제주데이터허브에 감귤 생산 자료가 있어요. 몬딱에게 '허브 감귤 자료 보여 줘'라고 말해 보세요.",
-             ["이용자 질문(개인정보 가림): 서귀포 감귤 생산량이 궁금해요", "데이터 사서가 고른 센터 표: 없음"]),
+             ["이용자 질문(개인정보 가림): 서귀포 감귤 생산량이 궁금해요", "몬딱이 고른 센터 표: 없음"]),
     seedItem(2, "분석실 1번", 41, 11, 5, "만든 그림을 가져가도 되는지 알고 싶어 해요.", "반출 신청이 궁금해요", "coming", "",
              ["이용자 질문(개인정보 가림): 이 그림 밖으로 가져가도 돼요?"]),
   ];
   const archive = [{name: `${ago(63, 14, 30).slice(0, 10)} 14시30분.txt`,
-                    text: `${ago(63, 14, 30)}  분석실 3번\n찾으시는 것: 노형동 음식점 매출 파일을 받는 방법을 알고 싶어 해요.\n도움이 필요한 이유: 파일 받는 방법을 모르겠어요\n\n처리 내용\n${ago(63, 14, 37)}  자리로 가는 중이라고 알림\n`}];
+                    text: `${ago(63, 14, 30)}  분석실 3번\n찾으시는 것: 노형동 음식점 매출 파일을 받는 방법을 알고 싶어 해요.\n도움이 필요한 이유: 파일 받는 방법을 모르겠어요\n\n처리 내용\n${ago(63, 14, 37)}  자리로 간다고 알림\n`}];
   const visits = {};                       // 달(YYYY-MM) → 방문 줄
   function addVisit(r) { (visits[r.date.slice(0, 7)] = visits[r.date.slice(0, 7)] || []).push(r); }
   (function seedVisits() {
@@ -114,8 +114,8 @@
                                           : archive.slice().sort((a, b) => b.name.localeCompare(a.name));
     const draw = () => {
       const list = files(), cur = list.find(f => f.name === open);
-      v.innerHTML = `<div class="modal folder"><div class="mh">📁 보관 › ${which === "visit" ? "방문 내역" : "처리 내용"}</div>
-        <div class="fbody"><div class="flist">${list.length ? list.map(f => `<div class="frow ${f.name === open ? "on" : ""}" data-f="${esc0(f.name)}"><span>📄 ${esc0(f.name)}</span>
+      v.innerHTML = `<div class="modal folder"><div class="mh">보관 › ${which === "visit" ? "방문 내역" : "처리 내용"}</div>
+        <div class="fbody"><div class="flist">${list.length ? list.map(f => `<div class="frow ${f.name === open ? "on" : ""}" data-f="${esc0(f.name)}"><span>${esc0(f.name)}</span>
           <button class="fdel" data-del="${esc0(f.name)}" title="이 파일 지우기">지우기</button></div>`).join("") : `<p class="none">이 폴더는 비어 있어요.</p>`}</div>
           <pre class="ftext">${cur ? esc0(cur.text) : "파일을 누르면 내용을 볼 수 있어요.\n\n여기서 파일을 지우면 직원 화면에서도 바로 사라져요."}</pre></div>
         <div class="mf"><button class="btn" data-x>닫기</button></div></div>`;

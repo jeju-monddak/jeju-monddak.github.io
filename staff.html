@@ -152,6 +152,8 @@ textarea:focus{outline:none;border-color:var(--o);box-shadow:0 0 0 3px rgba(244,
 .toast{position:fixed;right:20px;bottom:20px;background:#2b2622;color:#fff;border-radius:12px;padding:13px 20px;font-size:16.5px;font-weight:700;
   box-shadow:0 10px 26px rgba(0,0,0,.2);opacity:0;transform:translateY(8px);transition:.25s;max-width:440px}
 .toast.show{opacity:1;transform:none}
+.cplink{border:0;background:none;padding:0;font:inherit;color:#c25a0b;text-decoration:underline;text-underline-offset:3px;cursor:copy;word-break:break-all;text-align:left}
+.cplink:hover{color:#f2700f}
 </style>
 <link rel="stylesheet" href="demo.css?v=f1db63d9"></head>
 <body>
@@ -164,8 +166,8 @@ textarea:focus{outline:none;border-color:var(--o);box-shadow:0 0 0 3px rgba(244,
   <section class="note" id="note"></section>
 </main>
 <div class="toast" id="toast" role="status"></div>
-<script src="data.js?v=1055e342"></script>
-<script src="staff_demo.js?v=7564c7c4"></script>
+<script src="data.js?v=befa328e"></script>
+<script src="staff_demo.js?v=42f757ea"></script>
 <script>
 const KO = {new:"새 문의", coming:"자리로 방문", replied:"답변 완료", done:"처리 완료", left:"상담 끝남"};
 const P = new URLSearchParams(location.hash.slice(1));
@@ -201,6 +203,20 @@ const inbox = () => items.filter(i => !HANDLED.includes(i.status));
 const doneList = () => items.filter(i => HANDLED.includes(i.status)).sort((a, b) => String(b.updated || "").localeCompare(String(a.updated || "")));
 // 문의 카드의 때: "2026년 11월 19일 13:39"(11/19: 시간만 있어 며칠 전 문의인지 모른다는 지적)
 const when = t => { const m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2})/.exec(t || ""); return m ? `${m[1]}년 ${+m[2]}월 ${+m[3]}일 ${m[4]}` : String(t || "").slice(-5); };
+// 꼬리표·처리 내용 줄처럼 좁은 곳: "11월 19일 13:39"(11/19 전수 점검: 카드 말고도 시간만 나오는 곳이 남아 있었음)
+const whenShort = t => { const m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2})/.exec(t || ""); return m ? `${+m[2]}월 ${+m[3]}일 ${m[4]}` : String(t || "").slice(-5); };
+// 주소는 누르면 복사(방문객 화면과 같게)
+const linkify = h => h.replace(/https?:\/\/[A-Za-z0-9\-._~:\/?#\[\]@!$&'()*+,;=%]+/g, m => {
+  const u = m.replace(/(?:&#39;|&quot;|[.,;:!?)\]'])+$/, "");
+  return `<button class="cplink" data-url="${u}" title="누르면 주소가 복사돼요">${u}</button>` + m.slice(u.length); });
+document.addEventListener("click", async e => {
+  const b = e.target.closest(".cplink"); if (!b) return;
+  const u = b.dataset.url; let ok = false;
+  try { await navigator.clipboard.writeText(u); ok = true; } catch (er) {
+    const t = document.createElement("textarea"); t.value = u; t.style.position = "fixed"; t.style.opacity = "0";
+    document.body.appendChild(t); t.select(); try { ok = document.execCommand("copy"); } catch (e2) { ok = false; } t.remove(); }
+  toast(ok ? "주소를 복사했어요. 인터넷 창 주소칸에 붙여 넣어 주세요." : "복사하지 못했어요. 주소를 직접 적어 주세요.");
+});
 const doneTime = i => ((i.history || []).filter(h => h.kind === "done").pop() || {}).time || "";
 const lastTime = i => ((i.history || []).slice(-1)[0] || {}).time || "";
 
@@ -209,7 +225,7 @@ const staffAct = i => (i.history || []).filter(h => h.kind === "reply" || h.kind
 function tagOf(i) {
   if (HANDLED.includes(i.status)) {
     const a = staffAct(i);
-    if (a) return `<span class="${a.kind === "reply" ? "kreply" : "kvisit"}">${a.kind === "reply" ? "답변 완료" : "자리로 방문"} ${esc((a.time || "").slice(-5))}</span>`;
+    if (a) return `<span class="${a.kind === "reply" ? "kreply" : "kvisit"}">${a.kind === "reply" ? "답변 완료" : "자리로 방문"} ${esc(whenShort(a.time))}</span>`;
     return `<span class="left">상담 끝남</span>`;                       // 직원이 손대기 전에 이용자가 상담을 끝냄
   }
   if (!i.read) return `<span class="new">안 읽음</span>`;
@@ -237,7 +253,7 @@ function renderList() {
       </button>`).join("") : `<p class="none">아직 쌓인 방문 내역이 없어요. 이용자가 상담을 끝내면 한 줄씩 쌓여요.</p>`);
   } else {
     const bar = tab !== "done" ? "" : picking
-      ? `<div class="pickbar"><b>${picked.size ? `${picked.size}건 골랐어요` : "옮기거나 지울 문의를 눌러 고르세요"}</b><div class="tidy">
+      ? `<div class="pickbar"><b>${picked.size ? `${picked.size}건 골랐어요` : "옮기거나 지울 문의를 눌러서 골라 주세요"}</b><div class="tidy">
            <button class="btn o" id="pMove" ${picked.size ? "" : "disabled"}>보관 폴더로 옮기기</button>
            <button class="btn r" id="pDel" ${picked.size ? "" : "disabled"}>지우기</button>
            <button class="btn" id="pStop">취소</button></div></div>`
@@ -275,7 +291,7 @@ function renderList() {
   if ($("pStart")) $("pStart").onclick = () => { picking = true; sel = ""; render(); };
   if ($("pStop")) $("pStop").onclick = () => { picking = false; picked.clear(); render(); };
   if ($("pMove")) $("pMove").onclick = () => clearDone("pick", "move", [...picked]);
-  if ($("pDel")) $("pDel").onclick = () => confirmBox(`고른 ${picked.size}건을 지울까요?`, "지운 내용은 되살릴 수 없어요. 남겨 두려면 '보관 폴더로 옮기기'를 누르세요.",
+  if ($("pDel")) $("pDel").onclick = () => confirmBox(`고른 ${picked.size}건을 지울까요?`, "지운 내용은 되살릴 수 없어요. 남겨 두려면 '보관 폴더로 옮기기'를 눌러 주세요.",
     () => clearDone("pick", "delete", [...picked]));
 }
 
@@ -325,14 +341,14 @@ function renderNote() {
   const same = t => String(t || "").replace(/\s/g, "") === String(cur.want || "").replace(/\s/g, "");
   const secs = m.secs.filter(s => !(s.ps.length === 1 && !s.items.length && same(s.ps[0])))   // 위 '찾으시는 것'과 같은 글은 한 번만
     .map(s => `<div class="sec"><h3>${esc(s.h)}</h3>${s.ps.map(p => `<p>${lines(p)}</p>`).join("")}${
-    s.items.length ? `<ul>${s.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div>`).join("");
-  const hist = (cur.history || []).map(h => `<div class="h"><time>${esc((h.time || "").slice(-5))}</time>${
-    {coming: "자리로 가는 중이라고 알림", reply: "직접 답변", done: "처리 완료", left: "이용자가 상담을 끝냄"}[h.kind]}${h.text ? " · " + esc(h.text) : ""}${h.file_name ? " · 보낸 파일 " + esc(h.file_name) : ""}</div>`).join("");
+    s.items.length ? `<ul>${s.items.map(x => `<li>${linkify(esc(x))}</li>`).join("")}</ul>` : ""}</div>`).join("");
+  const hist = (cur.history || []).map(h => `<div class="h"><time>${esc(whenShort(h.time))}</time>${
+    {coming: "자리로 간다고 알림", reply: "직접 답변", done: "처리 완료", left: "이용자가 상담을 끝냄"}[h.kind]}${h.text ? " · " + esc(h.text) : ""}${h.file_name ? " · 보낸 파일 " + esc(h.file_name) : ""}</div>`).join("");
   $("note").innerHTML = `
     <div class="seat">${esc(cur.seat)}</div>
-    <div class="when">${m.when ? "받은 시각 " + esc(m.when) + " · " : ""}${KO[cur.status] || ""}</div>
-    ${done ? `<div class="donebar">${esc(doneTime(cur).slice(-5))}에 처리 완료한 문의예요. 문의 내용과 처리 내용을 다시 읽을 수 있어요.</div>` : ""}
-    ${left ? `<div class="gone">이용자가 ${esc((cur.left_time || "").slice(-5))}에 상담을 끝냈어요. 자리로 가지 않아도 돼요.</div>` : ""}
+    <div class="when">${m.when ? "받은 시각 " + esc(when(m.when)) + " · " : ""}${KO[cur.status] || ""}</div>
+    ${done ? `<div class="donebar">${esc(when(doneTime(cur)))}에 처리 완료한 문의예요. 문의 내용과 처리 내용을 다시 읽을 수 있어요.</div>` : ""}
+    ${left ? `<div class="gone">이용자가 ${esc(when(cur.left_time))}에 상담을 끝냈어요. 자리로 가지 않아도 돼요.</div>` : ""}
     <div class="info"><div class="it"><span class="lab">찾으시는 것</span><div class="val">${lines(cur.want || "적힌 내용이 없어요. 이용자에게 직접 여쭤봐 주세요.")}</div></div>
       ${cur.why ? `<div class="it why"><span class="lab">도움이 필요한 이유</span><div class="val">${lines(cur.why)}</div></div>` : ""}</div>
     ${done ? "" : `<div class="actions">
@@ -356,7 +372,7 @@ function renderNote() {
     refresh();
   }).catch(() => { toast("이용자에게 전하지 못했어요. 이용자가 상담을 끝냈을 수 있어요. 잠시 뒤 다시 눌러 주세요."); refresh(); });
   if (done) return;                                                     // 처리 완료한 문의: 읽기만
-  $("go").onclick = () => push("coming", {}, "이용자 화면에 '센터 직원이 자리로 가고 있어요'가 떠요.");
+  $("go").onclick = () => push("coming", {}, "이용자 화면에 '직원이 이 자리로 오고 있어요'가 떠요.");
   $("rep").onclick = () => { replyOpen = !replyOpen; $("replyBox").classList.toggle("open", replyOpen); if (replyOpen) $("txt").focus(); };
   $("cancel").onclick = () => { replyOpen = false; file = null; renderNote(); };
   $("fileIn").onchange = e => { file = e.target.files[0] || null; $("fname").textContent = file ? file.name : ""; $("drop").classList.toggle("has", !!file); };
@@ -389,7 +405,7 @@ async function refresh() {
   try {
     const d = await api("/api/items");
     $("live").className = "live" + (d.alive ? "" : " off");
-    $("live").textContent = d.alive ? "알림 받는 중" : "알림 꺼짐 · 컴퓨터를 다시 켜 주세요";
+    $("live").textContent = d.alive ? "알림 받는 중" : "알림이 꺼졌어요 · 컴퓨터를 다시 켜 주세요";
     const fresh = d.items.filter(i => seen && !seen.has(i.session));
     seen = new Set(d.items.map(i => i.session));
     items = d.items; oldDone = d.old_done || 0; clearDays = d.clear_days || 30;
@@ -405,7 +421,7 @@ async function refresh() {
     lastStatus = Object.fromEntries(items.map(i => [i.session, i.status]));
     render();
   } catch (e) {
-    $("live").className = "live off"; $("live").textContent = "연결 끊김 · 컴퓨터를 다시 켜 주세요";
+    $("live").className = "live off"; $("live").textContent = "연결이 끊겼어요 · 컴퓨터를 다시 켜 주세요";
   }
 }
 refresh(); setInterval(refresh, 3000);
